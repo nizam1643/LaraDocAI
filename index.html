@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Isi Kandungan - Modul Pembelajaran Laravel</title>
+  <style>
+    /* CSS Custom Properties - selaraskan dengan fail modul jika perlu */
+    :root {
+      --primary-color: #2c3e50; /* Biru Gelap */
+      --secondary-color: #3498db; /* Biru Terang */
+      --accent-color: #e74c3c; /* Warna aksen untuk sub-tajuk */
+      --background-light: #f7f7f9;
+      --background-default: #fff;
+      --text-color-light: #fff;
+      --text-color-dark: #333;
+      --text-color-muted: #555;
+      --border-color-light: #ddd;
+      --border-color-medium: #ccc;
+      --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --max-width-container: 960px;
+      --padding-large: 40px;
+      --padding-medium: 20px;
+      --padding-small: 10px;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-light);
+      color: var(--text-color-dark);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: var(--max-width-container);
+      margin: var(--padding-medium) auto;
+      padding: var(--padding-medium) var(--padding-large);
+      background-color: var(--background-default);
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      border-radius: 8px;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: var(--text-color-light);
+      padding: var(--padding-medium) var(--padding-large);
+      text-align: center;
+      margin-bottom: var(--padding-large);
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 2em;
+    }
+
+    .toc-main-title { /* Menggantikan .toc-title untuk tajuk utama dalam container */
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--border-color-light);
+      padding-bottom: var(--padding-small);
+      margin-bottom: var(--padding-medium);
+      font-size: 1.75em;
+    }
+
+    .module-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .module-item { /* Menggantikan .module-list li */
+      margin-bottom: var(--padding-large); /* Jarak lebih besar antara modul */
+      background-color: #fdfdfd;
+      border: 1px solid var(--border-color-light);
+      padding: var(--padding-medium);
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .module-title-link { /* Menggantikan .module-list a */
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: bold;
+      font-size: 1.5em; /* Besarkan tajuk modul */
+      display: block;
+      margin-bottom: var(--padding-small);
+      transition: color 0.2s ease-in-out;
+    }
+
+    .module-title-link:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+
+    .module-details h5 { /* Sub-tajuk seperti Hasil Pembelajaran, Kandungan Modul, dll. */
+        font-size: 1.1em;
+        color: var(--accent-color);
+        margin-top: var(--padding-medium);
+        margin-bottom: var(--padding-small);
+        border-bottom: 1px solid var(--border-color-medium);
+        padding-bottom: 5px;
+    }
+
+    .module-details p,
+    .module-details ul {
+        font-size: 0.95em;
+        color: var(--text-color-muted);
+        margin-bottom: var(--padding-small);
+    }
+
+    .module-details ul {
+        list-style: disc; /* Guna bullet biasa */
+        padding-left: var(--padding-medium);
+        margin-left: var(--padding-small);
+    }
+    .module-details ul li {
+        margin-bottom: 5px;
+    }
+
+
+    footer {
+      text-align: center;
+      margin-top: var(--padding-large);
+      padding: var(--padding-medium);
+      font-size: 0.9em;
+      color: #777;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+        .container {
+            margin: var(--padding-small) auto;
+            padding: var(--padding-small) var(--padding-medium);
+        }
+        header {
+            padding: var(--padding-small) var(--padding-medium);
+            margin-bottom: var(--padding-medium);
+        }
+        header h1 {
+            font-size: 1.5em;
+        }
+        .toc-main-title {
+            font-size: 1.5em;
+        }
+        .module-title-link {
+            font-size: 1.3em;
+        }
+        .module-details h5 {
+            font-size: 1em;
+        }
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Isi Kandungan Modul Pembelajaran</h1>
+  </header>
+
+  <div class="container">
+    <h2 class="toc-main-title">Senarai Modul</h2>
+    <ul class="module-list">
+      <li class="module-item">
+        <a href="modul-1.html" class="module-title-link" target="_blank" rel="noopener noreferrer">Modul 1: Persediaan Laravel & Asas Kerangka</a>
+        <div class="module-details">
+          <h5>Hasil Pembelajaran:</h5>
+          <p>Pelajar dapat menyediakan persekitaran pembangunan Laravel sepenuhnya serta memahami struktur asas MVC, routing, dan Blade templating.</p>
+          
+          <h5>Kandungan Modul:</h5>
+          <ul>
+            <li>Pemasangan XAMPP, Composer, Node.js, Git, dan Visual Studio Code</li>
+            <li>Penciptaan projek Laravel menggunakan Composer</li>
+            <li>Konfigurasi fail .env dan pelaksanaan migrasi awal</li>
+            <li>Pengenalan kepada konsep Model-View-Controller (MVC) dalam Laravel</li>
+            <li>Penggunaan routing asas melalui fail web.php</li>
+            <li>Penggunaan Blade templating dan penyediaan layout asas</li>
+            <li>Pemasangan Laravel Bootstrap Auth Scaffolding dan Spatie Laravel Permission</li>
+          </ul>
+
+          <h5>Aktiviti Pembelajaran:</h5>
+          <ul>
+            <li>Menyediakan projek Laravel</li>
+            <li>Ujian login dan navigasi asas sistem</li>
+          </ul>
+
+          <h5>Penilaian:</h5>
+          <ul>
+            <li>Sistem Laravel dapat dijalankan dengan login berfungsi</li>
+            <li>Struktur folder dan kod difahami oleh pelajar</li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="module-item">
+        <a href="modul-2.html" class="module-title-link" target="_blank" rel="noopener noreferrer">Modul 2: Antaramuka Dinamik dan CRUD Interaktif</a>
+        <div class="module-details">
+          <h5>Hasil Pembelajaran:</h5>
+          <p>Pelajar dapat membina antaramuka pengguna yang dinamik menggunakan JavaScript serta melaksanakan operasi CRUD secara interaktif menggunakan AJAX.</p>
+          
+          <h5>Kandungan Modul:</h5>
+          <ul>
+            <li>Pembinaan borang pelajar dengan pengesahan input menggunakan JavaScript</li>
+            <li>Interaksi masa nyata seperti pratonton data dan medan bersyarat</li>
+            <li>Struktur CRUD Laravel: model, migration, controller, view</li>
+            <li>Penggunaan modal Bootstrap untuk tambah dan kemaskini data</li>
+            <li>Penggunaan AJAX Fetch API untuk tambah, kemaskini dan hapus data tanpa 'page reload'</li>
+          </ul>
+
+          <h5>Aktiviti Pembelajaran:</h5>
+          <ul>
+            <li>Membina senarai pelajar interaktif</li>
+            <li>Mengintegrasikan AJAX ke dalam operasi CRUD melalui modal</li>
+          </ul>
+
+          <h5>Penilaian:</h5>
+          <ul>
+            <li>Semua operasi CRUD berfungsi tanpa muat semula halaman</li>
+            <li>Interaksi dinamik diuji secara manual dan berfungsi sepenuhnya</li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="module-item">
+        <a href="modul-3.html" class="module-title-link" target="_blank" rel="noopener noreferrer">Modul 3: Pengujian Unit menggunakan PHPUnit / Pest</a>
+        <div class="module-details">
+          <h5>Hasil Pembelajaran:</h5>
+          <p>Pelajar dapat menulis dan menjalankan ujian unit terhadap model dan controller dalam Laravel menggunakan PHPUnit atau Pest.</p>
+          
+          <h5>Kandungan Modul:</h5>
+          <ul>
+            <li>Pengenalan kepada perintah php artisan test</li>
+            <li>Pemasangan dan konfigurasi asas Pest (jika digunakan)</li>
+            <li>Penulisan ujian unit untuk pengesahan model, logik controller, dan capaian route</li>
+          </ul>
+
+          <h5>Aktiviti Pembelajaran:</h5>
+          <ul>
+            <li>Membina fail ujian bagi penyimpanan data pelajar</li>
+            <li>Menjalankan dan mengesahkan keputusan ujian</li>
+          </ul>
+
+          <h5>Penilaian:</h5>
+          <ul>
+            <li>Minimum 3 ujian unit dijalankan dan lulus</li>
+            <li>Pelajar memahami asas pembangunan berasaskan ujian (TDD)</li>
+          </ul>
+        </div>
+      </li>
+      
+      <li class="module-item">
+        <a href="modul-4.html" class="module-title-link" target="_blank" rel="noopener noreferrer">Modul 4: Penjana Dokumentasi Tersuai menggunakan OpenAI</a>
+        <div class="module-details">
+          <h5>Hasil Pembelajaran:</h5>
+          <p>Pelajar dapat menjana dokumentasi sistem secara automatik menggunakan OpenAI dan memaparkannya dalam antaramuka web.</p>
+          
+          <h5>Kandungan Modul:</h5>
+          <ul>
+            <li>Pembinaan Artisan Command: <code>generate:docs</code></li>
+            <li>Imbasan fail controller dan view untuk mengenal pasti struktur dan logik</li>
+            <li>Integrasi OpenAI API untuk menjana dokumentasi dalam format JSON</li>
+            <li>Penyimpanan hasil dokumentasi ke dalam jadual pangkalan data (<code>documentation_entries</code>)</li>
+            <li>Paparan dokumentasi melalui templat Blade pada halaman <code>/docs</code></li>
+          </ul>
+
+          <h5>Aktiviti Pembelajaran:</h5>
+          <ul>
+            <li>Membangunkan perintah Laravel tersuai</li>
+            <li>Mempratonton dokumentasi dalam antaramuka templat sedia ada</li>
+          </ul>
+
+          <h5>Penilaian:</h5>
+          <ul>
+            <li>Dokumentasi dalam format JSON berjaya disimpan ke dalam pangkalan data</li>
+            <li>Halaman <code>/docs</code> dapat dibaca dan digunakan dengan baik oleh pengguna akhir</li>
+          </ul>
+        </div>
+      </li>
+
+      </ul>
+  </div>
+
+  <footer>
+    <p>&copy; <span id="currentYear"></span> Nama Anda / Nama Organisasi. Hak Cipta Terpelihara.</p>
+  </footer>
+
+  <script>
+    // Skrip untuk mendapatkan tahun semasa untuk footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
