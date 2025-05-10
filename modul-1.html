@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modul 1: Laravel & Asas Kerangka</title>
+  <style>
+    /* CSS Custom Properties for easier theming */
+    :root {
+      --primary-color: #2c3e50; /* Biru Gelap */
+      --secondary-color: #3498db; /* Biru Terang */
+      --accent-color: #f39c12;   /* Oren */
+      --background-light: #f7f7f9;
+      --background-default: #fff;
+      --text-color-light: #fff;
+      --text-color-dark: #333;
+      --border-color-light: #ddd;
+      --border-color-medium: #ccc;
+      --code-bg-color: #f1f1f1;
+      --table-header-bg: #e8f4fd;
+      --note-bg-color: #fff8e1;
+
+      --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --font-code: 'Courier New', Courier, monospace;
+
+      --max-width-container: 960px;
+      --padding-large: 40px;
+      --padding-medium: 20px;
+      --padding-small: 10px;
+      --padding-table-cell: 12px;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-light);
+      color: var(--text-color-dark);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: var(--text-color-light);
+      padding: var(--padding-medium) var(--padding-large);
+      text-align: center;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 2em; /* Saiz yang lebih responsif */
+    }
+
+    main {
+      max-width: var(--max-width-container);
+      margin: 0 auto;
+      background-color: var(--background-default);
+      padding: var(--padding-large);
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    h2, h3, h4, h5 { /* Tambah h5 */
+      color: var(--primary-color);
+      margin-top: var(--padding-large);
+    }
+
+    h2 {
+      border-left: 6px solid var(--secondary-color);
+      padding-left: var(--padding-small);
+      font-size: 1.75em; /* 28px / 16px */
+      margin-bottom: var(--padding-medium); /* Tambah margin bawah */
+    }
+
+    h3 {
+      border-bottom: 2px solid var(--border-color-light);
+      padding-bottom: 5px;
+      font-size: 1.375em; /* 22px / 16px */
+      margin-bottom: var(--padding-small); /* Tambah margin bawah */
+    }
+
+    h4 {
+      font-size: 1.125em; /* 18px / 16px */
+      margin-top: calc(var(--padding-large) * 0.75); /* 30px */
+      margin-bottom: calc(var(--padding-small) * 0.5); /* Tambah margin bawah */
+    }
+
+    h5 {
+      font-size: 1em; /* 16px */
+      margin-top: var(--padding-medium);
+      margin-bottom: calc(var(--padding-small) * 0.25); /* Tambah margin bawah */
+      color: var(--secondary-color); /* Bezakan sedikit h5 */
+    }
+
+
+    p, li {
+      font-size: 1em; /* 16px */
+      margin-bottom: var(--padding-small);
+    }
+
+    ul, ol {
+        padding-left: var(--padding-medium);
+        margin-left: var(--padding-small); /* Tambah sedikit margin kiri untuk list */
+    }
+
+    pre {
+      background-color: var(--code-bg-color);
+      padding: var(--padding-medium); /* Sedikit lebih padding */
+      overflow-x: auto;
+      border-left: 4px solid var(--secondary-color);
+      margin: var(--padding-medium) 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border-radius: 4px; /* Sudut lembut */
+    }
+
+    code {
+      font-family: var(--font-code);
+      background-color: var(--code-bg-color);
+      padding: 2px 5px; /* Sedikit lebih padding */
+      border-radius: 4px; /* Sudut lembut */
+      font-size: 0.9em;
+    }
+
+    pre code {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+        font-size: inherit;
+        border-left: none; /* Elakkan double border */
+        white-space: pre-wrap; /* Kekalkan pemformatan dalam pre */
+        word-break: break-all; /* Untuk memecahkan perkataan yang sangat panjang jika perlu */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--padding-medium) 0;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+    }
+
+    table, th, td {
+      border: 1px solid var(--border-color-medium);
+    }
+
+    th, td {
+      padding: var(--padding-table-cell);
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--table-header-bg);
+      font-weight: bold;
+    }
+
+    a {
+      color: var(--secondary-color);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover, a:focus {
+      text-decoration: underline;
+      color: var(--primary-color);
+    }
+
+    .note {
+      background-color: var(--note-bg-color);
+      padding: var(--padding-medium);
+      border-left: 5px solid var(--accent-color);
+      margin: var(--padding-medium) 0;
+      border-radius: 4px;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background-color: var(--border-color-light);
+      margin: var(--padding-large) 0;
+    }
+
+    .back-to-top-container {
+      text-align: right;
+      margin-top: var(--padding-large);
+    }
+
+    .back-to-top-button {
+      display: inline-block;
+      padding: var(--padding-small) var(--padding-medium);
+      background-color: var(--secondary-color);
+      color: var(--text-color-light);
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.875em; /* 14px */
+      transition: background-color 0.3s ease;
+    }
+
+    .back-to-top-button:hover, .back-to-top-button:focus {
+      background-color: var(--primary-color);
+      text-decoration: none;
+      color: var(--text-color-light);
+    }
+
+    /* Specific styling for folder structure */
+    .folder-structure {
+        font-family: var(--font-code);
+        background-color: var(--code-bg-color);
+        padding: var(--padding-medium);
+        border-left: 4px solid var(--primary-color); /* Different color for distinction */
+        border-radius: 4px;
+        margin: var(--padding-medium) 0;
+        white-space: pre; /* Preserve whitespace for structure */
+        overflow-x: auto;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Modul 1: Persediaan Laravel & Asas Kerangka</h1>
+  </header>
+
+  <main id="content">
+    <h2>Modul 1: Persediaan Laravel & Asas Kerangka</h2>
+
+    <h3>Hasil Pembelajaran</h3>
+    <p>Pelajar dapat menyediakan persekitaran pembangunan Laravel sepenuhnya serta memahami struktur asas Model-View-Controller (MVC), penggunaan routing, serta Blade templating dalam pembangunan antaramuka sistem web.</p>
+    <hr>
+
+    <h3>Bab 1.1: Pemasangan Perisian Asas</h3>
+    <p>Sebelum memulakan pembangunan sistem menggunakan Laravel, pelajar perlu menyediakan beberapa perisian asas yang akan membentuk persekitaran pembangunan. Langkah-langkah pemasangan adalah seperti berikut:</p>
+
+    <h4>Langkah 1: Pemasangan 7-Zip</h4>
+    <ol>
+      <li>Layari laman web rasmi: <a href="https://www.7-zip.org/download.html">https://www.7-zip.org/download.html</a>.</li>
+      <li>Pilih versi yang bersesuaian dengan sistem pengoperasian.</li>
+      <li>Muat turun dan jalankan pemasangan dengan tetapan lalai tanpa sebarang pengubahsuaian.</li>
+    </ol>
+
+    <h4>Langkah 2: Pemasangan Git</h4>
+    <ol>
+      <li>Layari laman web: <a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a>.</li>
+      <li>Pilih dan muat turun versi mengikut sistem pengoperasian.</li>
+      <li>Jalankan pemasangan secara lalai.</li>
+    </ol>
+
+    <h4>Langkah 3: Pemasangan XAMPP</h4>
+    <ol>
+      <li>Layari: <a href="https://www.apachefriends.org/download.html">https://www.apachefriends.org/download.html</a>.</li>
+      <li>Pilih versi PHP 8.2.x.</li>
+      <li>Jalankan pemasangan dengan konfigurasi lalai.</li>
+    </ol>
+
+    <h4>Langkah 4: Pemasangan Node.js</h4>
+    <ol>
+      <li>Lawati: <a href="https://nodejs.org/en/download">https://nodejs.org/en/download</a>.</li>
+      <li>Pilih versi LTS (contoh: 22.x.x seperti yang dinyatakan).</li>
+      <li>Jalankan pemasangan tanpa sebarang perubahan pada tetapan.</li>
+    </ol>
+
+    <h4>Langkah 5: Pemasangan Composer</h4>
+    <ol>
+      <li>Akses: <a href="https://getcomposer.org/download/">https://getcomposer.org/download/</a>.</li>
+      <li>Pilih versi stabil (contoh: 2.8.x) dan pastikan untuk menambah PHP ke PATH anda semasa pemasangan jika pilihan tersebut ada.</li>
+      <li>Selepas pemasangan selesai, buka terminal dan jalankan perintah berikut untuk konfigurasi repositori Packagist dan tetapan IPv6 (jika perlu):</li>
+    </ol>
+    <pre><code class="language-bash">composer config --global repo.packagist composer https://packagist.org
+netsh interface ipv6 set prefixpolicy ::ffff:0:0/96 55 4</code></pre>
+
+    <p>Disarankan untuk menambah direktori projek ke dalam pengecualian Windows Defender:</p>
+    <ul>
+      <li><strong>Windows Security &gt; Virus & threat protection &gt; Manage settings &gt; Add or remove exclusions</strong></li>
+      <li>Tambah direktori seperti <code>C:\xampp\htdocs</code></li>
+    </ul>
+
+    <h4>Langkah 6: Pemasangan Visual Studio Code</h4>
+    <p>Visual Studio Code (VS Code) merupakan editor kod sumber ringan yang sangat popular dalam pembangunan web dan Laravel.</p>
+    <h5>Langkah pemasangan:</h5>
+    <ol>
+      <li>Layari: <a href="https://code.visualstudio.com/Download">https://code.visualstudio.com/Download</a>.</li>
+      <li>Pilih versi yang sesuai (Windows/macOS/Linux).</li>
+      <li>Jalankan pemasangan dengan tetapan lalai.</li>
+      <li>Buka VS Code dan aktifkan "Auto Save": <strong>File &gt; Auto Save</strong>.</li>
+    </ol>
+
+    <h5>Senarai Extension Disarankan:</h5>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Extension</th>
+          <th>Fungsi Ringkas</th>
+          <th>Pautan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Auto Rename Tag</td><td>Menamakan tag HTML secara automatik apabila tag pembuka atau penutup diubah</td><td><a href="https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag">Link</a></td></tr>
+        <tr><td>Better Comments</td><td>Menyorot dan mengkategorikan komen dalam kod untuk rujukan cepat</td><td><a href="https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments">Link</a></td></tr>
+        <tr><td>Material Icon Theme</td><td>Memberikan ikon fail yang konsisten dan mesra pengguna</td><td><a href="https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme">Link</a></td></tr>
+        <tr><td>Laravel Extension Pack</td><td>Pakej lengkap sambungan berkaitan Laravel</td><td><a href="https://marketplace.visualstudio.com/items?itemName=onecentlin.laravel-extension-pack">Link</a></td></tr>
+        <tr><td>PHP Debug (Xdebug Pack)</td><td>Menyediakan keupayaan debugging untuk Laravel dan PHP</td><td><a href="https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug">Link</a></td></tr>
+        <tr><td>Intelephense</td><td>IntelliSense untuk kod PHP termasuk autocomplete dan linting</td><td><a href="https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client">Link</a></td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <p><strong>Nota:</strong> Klik butang "Install" dan pilih "Trust Author" apabila diminta untuk sambungan VS Code.</p>
+    </div>
+    <hr>
+
+    <h3>Bab 1.2: Penciptaan Projek Laravel Menggunakan Composer</h3>
+    <ol>
+      <li>Jalankan perintah berikut di terminal untuk navigasi ke direktori kerja anda (contoh: <code>htdocs</code> XAMPP):<br><code>cd C:\xampp\htdocs</code></li>
+      <li>Cipta projek Laravel baru (gantikan <code>nama_projek</code> dengan nama projek anda):<br><code>composer create-project laravel/laravel:~10.0 nama_projek --prefer-dist</code></li>
+      <li>Masuk ke direktori projek dan buka dalam VS Code:<br><code>cd nama_projek</code><br><code>code .</code></li>
+      <li>Klik "Yes, I trust the authors" apabila diminta oleh VS Code.</li>
+      <li>Klik ikon <code>+</code> di terminal VS Code untuk membuka terminal baharu dalam direktori projek.</li>
+    </ol>
+    <hr>
+
+    <h3>Bab 1.3: Konfigurasi Fail .env dan Pelaksanaan Migrasi Awal</h3>
+    <ol>
+      <li>Buka fail <code>.env</code> di root projek anda dan ubah konfigurasi pangkalan data seperti berikut (sesuaikan jika perlu):</li>
+    </ol>
+    <pre><code class="language-ini">DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=unicms # Nama pangkalan data anda
+DB_USERNAME=root   # Nama pengguna pangkalan data anda
+DB_PASSWORD=      # Kata laluan pangkalan data anda (kosongkan jika tiada)
+</code></pre>
+    <ol start="2">
+      <li>Cipta pangkalan data <code>unicms</code> (atau nama yang anda tetapkan) di phpMyAdmin atau alat pengurusan pangkalan data pilihan anda. Pastikan set aksara adalah <code>utf8mb4_unicode_ci</code>.</li>
+      <li>Dalam terminal VS Code (di dalam direktori projek), jalankan migrasi untuk mencipta jadual-jadual asas Laravel:<br><code>php artisan migrate</code></li>
+      <li>Mulakan pelayan pembangunan Laravel:<br><code>php artisan serve</code></li>
+      <li>Buka pelayar web dan layari alamat yang dipaparkan (biasanya <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>) untuk melihat laman utama Laravel.</li>
+    </ol>
+    <hr>
+
+    <h3>Bab 1.4: Pengenalan kepada Konsep Model-View-Controller (MVC) dalam Laravel</h3>
+    <p>Konsep MVC adalah corak seni bina perisian yang memisahkan aplikasi kepada tiga komponen utama yang saling berkaitan:</p>
+    <ul>
+      <li><strong>Model:</strong> Bertanggungjawab untuk mengurus data aplikasi. Ia berinteraksi dengan pangkalan data (contoh: jadual pengguna, produk), melakukan operasi CRUD (Create, Read, Update, Delete), dan melaksanakan logik perniagaan yang berkaitan dengan data. Dalam Laravel, Model biasanya terletak di direktori <code>app/Models</code>.</li>
+      <li><strong>View:</strong> Bertanggungjawab untuk memaparkan data kepada pengguna. Ia adalah antaramuka pengguna (UI) aplikasi yang dilihat oleh pengguna dalam pelayar. Dalam Laravel, Views biasanya ditulis menggunakan enjin templat Blade (fail <code>.blade.php</code>) dan terletak di direktori <code>resources/views</code>.</li>
+      <li><strong>Controller:</strong> Bertindak sebagai perantara antara Model dan View. Ia menerima input daripada pengguna (melalui request HTTP dari route), memproses input tersebut (mungkin dengan memanggil kaedah pada Model untuk mendapatkan atau mengubah data), dan kemudian memilih View yang sesuai serta menghantar data yang diperlukan ke View tersebut untuk dipaparkan. Controller dalam Laravel terletak di direktori <code>app/Http/Controllers</code>.</li>
+    </ul>
+    <hr>
+
+    <h3>Bab 1.5: Penggunaan Routing Asas melalui Fail web.php</h3>
+    <p>Fail <code>routes/web.php</code> adalah tempat anda mentakrifkan kebanyakan route untuk aplikasi web anda. Route ini akan diakses melalui pelayar dan memetakan URL ke tindakan Controller atau fungsi tertentu.</p>
+    <p>Contoh route ke halaman utama yang memaparkan view <code>welcome.blade.php</code>:</p>
+    <pre><code class="language-php">use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+</code></pre>
+    <p>Contoh route yang memanggil kaedah <code>index</code> dalam <code>HomeController</code> apabila URL <code>/home</code> diakses:</p>
+    <pre><code class="language-php">// Pastikan anda telah mencipta HomeController: php artisan make:controller HomeController
+use App\Http\Controllers\HomeController;
+
+Route::get('/home', [HomeController::class, 'index']);
+</code></pre>
+    <p>Contoh route dengan parameter dinamik (ID pelajar) yang memanggil kaedah <code>show</code> dalam <code>PelajarController</code>:</p>
+    <pre><code class="language-php">// Pastikan anda telah mencipta PelajarController: php artisan make:controller PelajarController
+use App\Http\Controllers\PelajarController;
+
+Route::get('/pelajar/{id}', [PelajarController::class, 'show']);
+// Dalam PelajarController, kaedah show akan menerima $id
+// public function show(string $id) { /* ... */ }
+</code></pre>
+    <hr>
+
+    <h3>Bab 1.6: Penggunaan Blade Templating dan Penyediaan Layout Asas</h3>
+    <p>Blade adalah enjin templat yang mudah tetapi berkuasa yang disediakan bersama Laravel. Ia tidak menghalang anda daripada menggunakan kod PHP biasa dalam view anda dan menyediakan ciri-ciri seperti pewarisan templat, bahagian (sections), komponen, dan arahan kawalan yang ringkas.</p>
+    <p><strong>Contoh layout utama (<code>resources/views/layouts/app.blade.php</code>):</strong></p>
+    <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="{{ str_replace('_', '-', app()->getLocale()) }}"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;@yield('title', config('app.name', 'Laravel')) - {{ config('app.name', 'Laravel') }}&lt;/title&gt;
+    {{-- Pautan ke CSS global --}}
+    &lt;link rel="stylesheet" href="{{ asset('css/app.css') }}"&gt; {{-- Contoh jika menggunakan Vite/Mix --}}
+    @stack('styles') {{-- Untuk CSS khusus halaman --}}
+&lt;/head&gt;
+&lt;body class="font-sans antialiased"&gt;
+    &lt;div class="min-h-screen bg-gray-100"&gt;
+        &lt;header class="bg-white shadow"&gt;
+            {{-- Masukkan navigasi utama di sini, contoh: @include('partials.navbar') --}}
+            &lt;div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8"&gt;
+                 &lt;h1 class="text-3xl font-bold text-gray-900"&gt;@yield('header_title', 'Dashboard')&lt;/h1&gt;
+            &lt;/div&gt;
+        &lt;/header&gt;
+
+        &lt;!-- Page Content --&gt;
+        &lt;main&gt;
+            &lt;div class="py-12"&gt;
+                &lt;div class="max-w-7xl mx-auto sm:px-6 lg:px-8"&gt;
+                    &lt;div class="bg-white overflow-hidden shadow-sm sm:rounded-lg"&gt;
+                        &lt;div class="p-6 bg-white border-b border-gray-200"&gt;
+                            @yield('content')
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/main&gt;
+
+        &lt;footer class="bg-white border-t border-gray-200"&gt;
+            &lt;div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500"&gt;
+                &amp;copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Hak Cipta Terpelihara.
+                {{-- Contoh: @include('partials.footer-content') --}}
+            &lt;/div&gt;
+        &lt;/footer&gt;
+    &lt;/div&gt;
+    {{-- Pautan ke JS global --}}
+    &lt;script src="{{ asset('js/app.js') }}" defer&gt;&lt;/script&gt; {{-- Contoh jika menggunakan Vite/Mix --}}
+    @stack('scripts') {{-- Untuk JavaScript khusus halaman --}}
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+    <p><strong>Contoh view yang menggunakan layout utama (<code>resources/views/home.blade.php</code>):</strong></p>
+    <pre><code class="language-php">@extends('layouts.app')
+
+@section('title', 'Halaman Utama')
+@section('header_title', 'Selamat Datang')
+
+@section('content')
+    &lt;div class="container"&gt;
+        &lt;h2&gt;Kandungan Halaman Utama&lt;/h2&gt;
+        &lt;p&gt;Ini adalah kandungan utama untuk halaman ini. Anda boleh menambah sebarang elemen HTML atau komponen Blade di sini.&lt;/p&gt;
+    &lt;/div&gt;
+@endsection
+
+@push('styles')
+&lt;!-- Letakkan tag &lt;link&gt; atau &lt;style&gt; khusus untuk halaman ini di sini --&gt;
+&lt;style&gt;
+    /* .container h2 { color: var(--primary-color); } */
+&lt;/style&gt;
+@endpush
+
+@push('scripts')
+&lt;!-- Letakkan tag &lt;script&gt; khusus untuk halaman ini di sini --&gt;
+&lt;script&gt;
+    // console.log('Skrip untuk halaman utama dimuatkan.');
+&lt;/script&gt;
+@endpush
+</code></pre>
+    <hr>
+
+    <h3>Bab 1.7: Pemasangan Laravel Bootstrap Auth Scaffolding dan Spatie Laravel Permission</h3>
+    <p><strong>Arahan Pemasangan Laravel UI (Bootstrap Auth Scaffolding):</strong></p>
+    <pre><code class="language-bash">composer require laravel/ui
+php artisan ui bootstrap --auth
+npm install
+npm run build # atau npm run dev untuk pembangunan
+</code></pre>
+    <div class="note">
+        <p><strong>Nota:</strong> Untuk projek Laravel yang lebih baru (Laravel 9+), Laravel Breeze atau Laravel Jetstream adalah pilihan scaffolding pengesahan yang lebih moden dan disyorkan. Jika anda menggunakan Vite (lalai dalam Laravel 9+), pastikan konfigurasi Vite anda betul.</p>
+    </div>
+
+    <p><strong>Arahan Pemasangan Spatie Laravel Permission:</strong></p>
+    <pre><code class="language-bash">composer require spatie/laravel-permission
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+php artisan migrate
+</code></pre>
+
+    <p><strong>Konfigurasi Model Pengguna (<code>app/Models/User.php</code>):</strong></p>
+    <pre><code class="language-php">namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles; // Import trait HasRoles
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable, HasRoles; // Guna trait HasRoles
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array&lt;int, string&gt;
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array&lt;int, string&gt;
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array&lt;string, string&gt;
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+</code></pre>
+
+    <p><strong>Daftar Middleware dalam <code>app/Http/Kernel.php</code> (bahagian <code>$middlewareAliases</code>):</strong></p>
+    <pre><code class="language-php">// Dalam fail app/Http/Kernel.php
+// ...
+protected $middlewareAliases = [ // atau $routeMiddleware untuk versi Laravel yang lebih lama
+    // ... middleware lain ...
+    'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+    'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+    'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+];
+// ...
+</code></pre>
+    <div class="note">
+        <p><strong>Nota:</strong> Untuk Laravel 11+, fail <code>Kernel.php</code> telah diubahsuai. Middleware biasanya didaftarkan dalam fail <code>bootstrap/app.php</code> menggunakan kaedah <code>->withMiddleware()</code>. Sila rujuk dokumentasi Spatie Laravel Permission dan Laravel untuk cara pendaftaran middleware yang terkini mengikut versi Laravel anda.</p>
+    </div>
+
+    <p><strong>Cipta Seeder untuk Roles, Permissions, dan Users:</strong></p>
+    <pre><code class="language-bash">php artisan make:seeder RolePermissionSeeder
+php artisan make:seeder UserSeeder
+</code></pre>
+
+    <p><strong>Isi kandungan <code>database/seeders/RolePermissionSeeder.php</code>:</strong></p>
+    <pre><code class="language-php">namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
+
+class RolePermissionSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Reset cached roles and permissions
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Cipta permissions asas (sesuaikan mengikut keperluan aplikasi)
+        Permission::updateOrCreate(['name' => 'view users', 'guard_name' => 'web']);
+        Permission::updateOrCreate(['name' => 'create users', 'guard_name' => 'web']);
+        Permission::updateOrCreate(['name' => 'edit users', 'guard_name' => 'web']);
+        Permission::updateOrCreate(['name' => 'delete users', 'guard_name' => 'web']);
+
+        Permission::updateOrCreate(['name' => 'view posts', 'guard_name' => 'web']);
+        Permission::updateOrCreate(['name' => 'create posts', 'guard_name' => 'web']);
+
+        // Cipta roles
+        $adminRole = Role::updateOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $staffRole = Role::updateOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $studentRole = Role::updateOrCreate(['name' => 'student', 'guard_name' => 'web']);
+
+        // Berikan semua permission kepada admin
+        $adminRole->givePermissionTo(Permission::all());
+
+        // Berikan permission tertentu kepada staff
+        $staffRole->givePermissionTo(['view posts', 'create posts']);
+
+        // Berikan permission tertentu kepada student
+        $studentRole->givePermissionTo(['view posts']);
+    }
+}
+</code></pre>
+
+    <p><strong>Isi kandungan <code>database/seeders/UserSeeder.php</code>:</strong></p>
+    <pre><code class="language-php">namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+class UserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            ['name' => 'Admin User', 'password' => Hash::make('password')]
+        );
+        $admin->assignRole('admin');
+
+        $staff = User::updateOrCreate(
+            ['email' => 'staff@example.com'],
+            ['name' => 'Staff User', 'password' => Hash::make('password')]
+        );
+        $staff->assignRole('staff');
+
+        $student = User::updateOrCreate(
+            ['email' => 'student@example.com'],
+            ['name' => 'Student User', 'password' => Hash::make('password')]
+        );
+        $student->assignRole('student');
+    }
+}
+</code></pre>
+
+    <p><strong>Daftar seeder dalam <code>database/seeders/DatabaseSeeder.php</code>:</strong></p>
+    <pre><code class="language-php">namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->call([
+            RolePermissionSeeder::class,
+            UserSeeder::class,
+            // Tambah seeder lain di sini jika ada
+        ]);
+    }
+}
+</code></pre>
+
+    <p><strong>Jalankan Seeder:</strong></p>
+    <pre><code class="language-bash">php artisan db:seed
+</code></pre>
+    <hr>
+
+    <h3>Bab 1.8: Penyediaan Struktur Blade Menggunakan Templat AdminLTE</h3>
+    <p>Dalam pembangunan antaramuka sistem web yang konsisten dan profesional, penggunaan templat siap guna seperti AdminLTE adalah sangat digalakkan. Laravel menyediakan kemudahan untuk memisahkan komponen antaramuka kepada fail-fail Blade yang modular dan boleh digunakan semula, seperti <code>layout.app</code>, <code>sidebar</code>, <code>header</code>, <code>footer</code>, dan halaman <code>home</code>.</p>
+
+    <h4>Langkah 1: Muat Turun dan Salin Fail Templat AdminLTE</h4>
+    <ol>
+        <li>Layari <a href="https://adminlte.io" target="_blank" rel="noopener noreferrer">https://adminlte.io</a> dan muat turun versi terkini AdminLTE (contohnya AdminLTE 3.x).</li>
+        <li>Ekstrak fail yang dimuat turun.</li>
+        <li>Salin folder <code>dist</code> dan <code>plugins</code> dari AdminLTE yang diekstrak ke dalam folder <code>public/</code> projek Laravel anda.</li>
+        <li>Anda juga mungkin memerlukan beberapa fail CSS atau JS tambahan dari AdminLTE atau untuk ikon (seperti Font Awesome yang biasanya disertakan atau disyorkan oleh AdminLTE). Letakkan ini juga dalam folder <code>public/css</code> atau <code>public/js</code> mengikut kesesuaian.</li>
+    </ol>
+    <p>Pastikan struktur folder anda di dalam <code>public/</code> lebih kurang seperti berikut (nama folder mungkin sedikit berbeza bergantung pada versi AdminLTE):</p>
+    <div class="folder-structure">public/
+  ├── css/        (Untuk CSS tambahan anda atau AdminLTE)
+  ├── js/         (Untuk JS tambahan anda atau AdminLTE)
+  ├── dist/       (Dari AdminLTE - mengandungi css, js, img)
+  └── plugins/    (Dari AdminLTE - mengandungi pelbagai plugin)
+  └── ...         (Fail lain dalam public seperti index.php, .htaccess)
+    </div>
+
+    <h4>Langkah 2: Sediakan Layout Utama – <code>resources/views/layouts/app.blade.php</code></h4>
+    <p>Ini akan menjadi fail layout utama yang akan digunakan oleh kebanyakan halaman dalam aplikasi anda.</p>
+    <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="{{ str_replace('_', '-', app()->getLocale()) }}"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;@yield('title', config('app.name', 'Laravel AdminLTE')) - {{ config('app.name', 'Laravel') }}&lt;/title&gt;
+
+    &lt;!-- Google Font: Source Sans Pro --&gt;
+    &lt;link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"&gt;
+    &lt;!-- Font Awesome Icons --&gt;
+    &lt;link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}"&gt;
+    &lt;!-- Theme style --&gt;
+    &lt;link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}"&gt;
+
+    @stack('styles') &lt;!-- Untuk CSS khusus halaman --&gt;
+&lt;/head&gt;
+&lt;body class="hold-transition sidebar-mini layout-fixed"&gt; {{-- Tambah layout-fixed untuk header & sidebar tetap --}}
+&lt;div class="wrapper"&gt;
+
+    &lt;!-- Preloader (Pilihan) --&gt;
+    &lt;div class="preloader flex-column justify-content-center align-items-center"&gt;
+        &lt;img class="animation__shake" src="{{ asset('dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo" height="60" width="60"&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Navbar --&gt;
+    @include('partials.header')
+    &lt;!-- /.navbar --&gt;
+
+    &lt;!-- Main Sidebar Container --&gt;
+    @include('partials.sidebar')
+
+    &lt;!-- Content Wrapper. Contains page content --&gt;
+    &lt;div class="content-wrapper"&gt;
+        &lt;!-- Content Header (Page header) --&gt;
+        &lt;section class="content-header"&gt;
+            &lt;div class="container-fluid"&gt;
+                &lt;div class="row mb-2"&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;h1&gt;@yield('page_title', 'Halaman')&lt;/h1&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;ol class="breadcrumb float-sm-right"&gt;
+                            &lt;li class="breadcrumb-item"&gt;&lt;a href="{{ url('/home') }}"&gt;Utama&lt;/a&gt;&lt;/li&gt;
+                            @yield('breadcrumb')
+                        &lt;/ol&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;&lt;!-- /.container-fluid --&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Main content --&gt;
+        &lt;section class="content"&gt;
+            &lt;div class="container-fluid"&gt;
+                @yield('content')
+            &lt;/div&gt;&lt;!-- /.container-fluid --&gt;
+        &lt;/section&gt;
+        &lt;!-- /.content --&gt;
+    &lt;/div&gt;
+    &lt;!-- /.content-wrapper --&gt;
+
+    &lt;!-- Footer --&gt;
+    @include('partials.footer')
+    &lt;!-- /.footer --&gt;
+
+    &lt;!-- Control Sidebar (Pilihan) --&gt;
+    &lt;aside class="control-sidebar control-sidebar-dark"&gt;
+        &lt;!-- Control sidebar content goes here --&gt;
+    &lt;/aside&gt;
+    &lt;!-- /.control-sidebar --&gt;
+
+&lt;/div&gt;
+&lt;!-- ./wrapper --&gt;
+
+&lt;!-- REQUIRED SCRIPTS --&gt;
+&lt;!-- jQuery --&gt;
+&lt;script src="{{ asset('plugins/jquery/jquery.min.js') }}"&gt;&lt;/script&gt;
+&lt;!-- Bootstrap 4 --&gt;
+&lt;script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"&gt;&lt;/script&gt;
+&lt;!-- AdminLTE App --&gt;
+&lt;script src="{{ asset('dist/js/adminlte.min.js') }}"&gt;&lt;/script&gt;
+{{-- &lt;script src="{{ asset('dist/js/demo.js') }}"&gt;&lt;/script&gt; --}} {{-- Untuk tujuan demo sahaja, boleh dibuang --}}
+
+@stack('scripts') &lt;!-- Untuk JavaScript khusus halaman --&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+    <div class="note">
+        <p><strong>Nota:</strong> Pastikan semua laluan aset (<code>asset(...)</code>) adalah betul berdasarkan di mana anda meletakkan fail AdminLTE dalam folder <code>public</code>. Contoh di atas mengandaikan anda menyalin folder <code>plugins</code> dan <code>dist</code> terus ke dalam <code>public</code>.</p>
+    </div>
+
+    <h4>Langkah 3: Fail Komponen Blade</h4>
+    <p>Cipta direktori <code>resources/views/partials/</code> jika belum wujud.</p>
+
+    <h5>a. Header – <code>resources/views/partials/header.blade.php</code></h5>
+    <pre><code class="language-html">&lt;!-- Navbar --&gt;
+&lt;nav class="main-header navbar navbar-expand navbar-white navbar-light"&gt;
+    &lt;!-- Left navbar links --&gt;
+    &lt;ul class="navbar-nav"&gt;
+        &lt;li class="nav-item"&gt;
+            &lt;a class="nav-link" data-widget="pushmenu" href="#" role="button"&gt;&lt;i class="fas fa-bars"&gt;&lt;/i&gt;&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class="nav-item d-none d-sm-inline-block"&gt;
+            &lt;a href="{{ url('/home') }}" class="nav-link"&gt;Halaman Utama&lt;/a&gt;
+        &lt;/li&gt;
+        {{-- Boleh tambah pautan lain di sini --}}
+    &lt;/ul&gt;
+
+    &lt;!-- Right navbar links --&gt;
+    &lt;ul class="navbar-nav ml-auto"&gt;
+        {{-- Authentication Links --}}
+        @guest
+            @if (Route::has('login'))
+                &lt;li class="nav-item"&gt;
+                    &lt;a class="nav-link" href="{{ route('login') }}"&gt;{{ __('Log Masuk') }}&lt;/a&gt;
+                &lt;/li&gt;
+            @endif
+
+            @if (Route::has('register'))
+                &lt;li class="nav-item"&gt;
+                    &lt;a class="nav-link" href="{{ route('register') }}"&gt;{{ __('Daftar') }}&lt;/a&gt;
+                &lt;/li&gt;
+            @endif
+        @else
+            &lt;li class="nav-item dropdown"&gt;
+                &lt;a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre&gt;
+                    {{ Auth::user()->name }}
+                &lt;/a&gt;
+
+                &lt;div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"&gt;
+                    &lt;a class="dropdown-item" href="{{ route('logout') }}"
+                       onclick="event.preventDefault();
+                                     document.getElementById('logout-form').submit();"&gt;
+                        {{ __('Log Keluar') }}
+                    &lt;/a&gt;
+
+                    &lt;form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none"&gt;
+                        @csrf
+                    &lt;/form&gt;
+                &lt;/div&gt;
+            &lt;/li&gt;
+        @endguest
+        &lt;li class="nav-item"&gt;
+            &lt;a class="nav-link" data-widget="fullscreen" href="#" role="button"&gt;
+                &lt;i class="fas fa-expand-arrows-alt"&gt;&lt;/i&gt;
+            &lt;/a&gt;
+        &lt;/li&gt;
+        {{-- Boleh tambah pautan atau ikon lain di sini --}}
+    &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;!-- /.navbar --&gt;
+</code></pre>
+
+    <h5>b. Sidebar – <code>resources/views/partials/sidebar.blade.php</code></h5>
+    <pre><code class="language-html">&lt;!-- Main Sidebar Container --&gt;
+&lt;aside class="main-sidebar sidebar-dark-primary elevation-4"&gt;
+    &lt;!-- Brand Logo --&gt;
+    &lt;a href="{{ url('/home') }}" class="brand-link"&gt;
+        &lt;img src="{{ asset('dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"&gt;
+        &lt;span class="brand-text font-weight-light"&gt;{{ config('app.name', 'LaravelApp') }}&lt;/span&gt;
+    &lt;/a&gt;
+
+    &lt;!-- Sidebar --&gt;
+    &lt;div class="sidebar"&gt;
+        &lt;!-- Sidebar user panel (optional) --&gt;
+        @auth
+        &lt;div class="user-panel mt-3 pb-3 mb-3 d-flex"&gt;
+            &lt;div class="image"&gt;
+                &lt;!-- Anda boleh menambah gambar profil pengguna di sini --&gt;
+                &lt;img src="{{ asset('dist/img/avatar5.png') }}" class="img-circle elevation-2" alt="User Image"&gt;
+            &lt;/div&gt;
+            &lt;div class="info"&gt;
+                &lt;a href="#" class="d-block"&gt;{{ Auth::user()->name }}&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        @endauth
+
+        &lt;!-- SidebarSearch Form (Pilihan) --&gt;
+        {{-- &lt;div class="form-inline"&gt;
+            &lt;div class="input-group" data-widget="sidebar-search"&gt;
+                &lt;input class="form-control form-control-sidebar" type="search" placeholder="Cari" aria-label="Search"&gt;
+                &lt;div class="input-group-append"&gt;
+                    &lt;button class="btn btn-sidebar"&gt;
+                        &lt;i class="fas fa-search fa-fw"&gt;&lt;/i&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt; --}}
+
+        &lt;!-- Sidebar Menu --&gt;
+        &lt;nav class="mt-2"&gt;
+            &lt;ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false"&gt;
+                &lt;!-- Tambah kelas nav-item, nav-link dan ikon dari Font Awesome --&gt;
+                &lt;li class="nav-item"&gt;
+                    &lt;a href="{{ url('/home') }}" class="nav-link {{ Request::is('home') ? 'active' : '' }}"&gt;
+                        &lt;i class="nav-icon fas fa-tachometer-alt"&gt;&lt;/i&gt;
+                        &lt;p&gt;
+                            Dashboard
+                            {{-- &lt;span class="right badge badge-danger"&gt;Baru&lt;/span&gt; --}}
+                        &lt;/p&gt;
+                    &lt;/a&gt;
+                &lt;/li&gt;
+
+                {{-- Contoh menu lain --}}
+                {{-- &lt;li class="nav-item menu-open"&gt;
+                    &lt;a href="#" class="nav-link active"&gt;
+                        &lt;i class="nav-icon fas fa-folder-open"&gt;&lt;/i&gt;
+                        &lt;p&gt;
+                            Contoh Menu
+                            &lt;i class="right fas fa-angle-left"&gt;&lt;/i&gt;
+                        &lt;/p&gt;
+                    &lt;/a&gt;
+                    &lt;ul class="nav nav-treeview"&gt;
+                        &lt;li class="nav-item"&gt;
+                            &lt;a href="#" class="nav-link active"&gt;
+                                &lt;i class="far fa-circle nav-icon"&gt;&lt;/i&gt;
+                                &lt;p&gt;Sub Menu Aktif&lt;/p&gt;
+                            &lt;/a&gt;
+                        &lt;/li&gt;
+                        &lt;li class="nav-item"&gt;
+                            &lt;a href="#" class="nav-link"&gt;
+                                &lt;i class="far fa-circle nav-icon"&gt;&lt;/i&gt;
+                                &lt;p&gt;Sub Menu Lain&lt;/p&gt;
+                            &lt;/a&gt;
+                        &lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/li&gt; --}}
+
+                &lt;li class="nav-header"&gt;PENGURUSAN PENGGUNA&lt;/li&gt;
+                @can('view users') {{-- Contoh penggunaan Spatie Permission --}}
+                &lt;li class="nav-item"&gt;
+                    &lt;a href="{{-- route('users.index') --}}" class="nav-link {{-- Request::is('users*') ? 'active' : '' --}}"&gt;
+                        &lt;i class="nav-icon fas fa-users"&gt;&lt;/i&gt;
+                        &lt;p&gt;Senarai Pengguna&lt;/p&gt;
+                    &lt;/a&gt;
+                &lt;/li&gt;
+                @endcan
+
+            &lt;/ul&gt;
+        &lt;/nav&gt;
+        &lt;!-- /.sidebar-menu --&gt;
+    &lt;/div&gt;
+    &lt;!-- /.sidebar --&gt;
+&lt;/aside&gt;
+</code></pre>
+
+    <h5>c. Footer – <code>resources/views/partials/footer.blade.php</code></h5>
+    <pre><code class="language-html">&lt;footer class="main-footer"&gt;
+    &lt;!-- To the right --&gt;
+    &lt;div class="float-right d-none d-sm-inline"&gt;
+        Apa sahaja yang anda mahu
+    &lt;/div&gt;
+    &lt;!-- Default to the left --&gt;
+    &lt;strong&gt;Hak Cipta &copy; {{ date('Y') }} &lt;a href="{{ url('/') }}"&gt;{{ config('app.name', 'LaravelApp') }}&lt;/a&gt;.&lt;/strong&gt; Semua hak terpelihara.
+&lt;/footer&gt;
+</code></pre>
+
+    <h4>Langkah 4: Halaman Utama – <code>resources/views/home.blade.php</code></h4>
+    <p>Kemas kini atau cipta fail ini untuk menggunakan layout AdminLTE.</p>
+    <pre><code class="language-php">@extends('layouts.app')
+
+@section('title', 'Dashboard Utama')
+@section('page_title', 'Dashboard') {{-- Untuk content header --}}
+
+@section('breadcrumb')
+    &lt;li class="breadcrumb-item active"&gt;Dashboard&lt;/li&gt;
+@endsection
+
+@section('content')
+    &lt;div class="container-fluid"&gt;
+        &lt;!-- Small boxes (Stat box) --&gt;
+        &lt;div class="row"&gt;
+            &lt;div class="col-lg-3 col-6"&gt;
+                &lt;!-- small box --&gt;
+                &lt;div class="small-box bg-info"&gt;
+                    &lt;div class="inner"&gt;
+                        &lt;h3&gt;150&lt;/h3&gt;
+                        &lt;p&gt;Pesanan Baru&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;div class="icon"&gt;
+                        &lt;i class="ion ion-bag"&gt;&lt;/i&gt; {{-- Pastikan anda ada Ionicons jika guna ini --}}
+                    &lt;/div&gt;
+                    &lt;a href="#" class="small-box-footer"&gt;Maklumat Lanjut &lt;i class="fas fa-arrow-circle-right"&gt;&lt;/i&gt;&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;!-- ./col --&gt;
+            &lt;div class="col-lg-3 col-6"&gt;
+                &lt;!-- small box --&gt;
+                &lt;div class="small-box bg-success"&gt;
+                    &lt;div class="inner"&gt;
+                        &lt;h3&gt;53&lt;sup style="font-size: 20px"&gt;%&lt;/sup&gt;&lt;/h3&gt;
+                        &lt;p&gt;Kadar Lantunan&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;div class="icon"&gt;
+                        &lt;i class="ion ion-stats-bars"&gt;&lt;/i&gt;
+                    &lt;/div&gt;
+                    &lt;a href="#" class="small-box-footer"&gt;Maklumat Lanjut &lt;i class="fas fa-arrow-circle-right"&gt;&lt;/i&gt;&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;!-- ./col --&gt;
+            &lt;div class="col-lg-3 col-6"&gt;
+                &lt;!-- small box --&gt;
+                &lt;div class="small-box bg-warning"&gt;
+                    &lt;div class="inner"&gt;
+                        &lt;h3&gt;44&lt;/h3&gt;
+                        &lt;p&gt;Pengguna Berdaftar&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;div class="icon"&gt;
+                        &lt;i class="ion ion-person-add"&gt;&lt;/i&gt;
+                    &lt;/div&gt;
+                    &lt;a href="#" class="small-box-footer"&gt;Maklumat Lanjut &lt;i class="fas fa-arrow-circle-right"&gt;&lt;/i&gt;&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;!-- ./col --&gt;
+            &lt;div class="col-lg-3 col-6"&gt;
+                &lt;!-- small box --&gt;
+                &lt;div class="small-box bg-danger"&gt;
+                    &lt;div class="inner"&gt;
+                        &lt;h3&gt;65&lt;/h3&gt;
+                        &lt;p&gt;Pelawat Unik&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;div class="icon"&gt;
+                        &lt;i class="ion ion-pie-graph"&gt;&lt;/i&gt;
+                    &lt;/div&gt;
+                    &lt;a href="#" class="small-box-footer"&gt;Maklumat Lanjut &lt;i class="fas fa-arrow-circle-right"&gt;&lt;/i&gt;&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;!-- ./col --&gt;
+        &lt;/div&gt;
+        &lt;!-- /.row --&gt;
+
+        &lt;div class="row"&gt;
+            &lt;div class="col-md-12"&gt;
+                &lt;div class="card"&gt;
+                    &lt;div class="card-header"&gt;
+                        &lt;h3 class="card-title"&gt;Selamat Datang ke Sistem Laravel dengan AdminLTE&lt;/h3&gt;
+                    &lt;/div&gt;
+                    &lt;div class="card-body"&gt;
+                        &lt;p class="lead"&gt;Ini merupakan paparan utama setelah login berjaya, menggunakan templat AdminLTE.&lt;/p&gt;
+                        &lt;p&gt;Anda boleh mula membina komponen dan ciri-ciri sistem anda di sini.&lt;/p&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+@endsection
+
+@push('scripts')
+    {{-- Jika anda menggunakan Ionicons atau plugin JS lain untuk statistik, masukkan di sini --}}
+    {{-- Contoh: &lt;script src="{{ asset('plugins/ionicons/ionicons.js') }}"&gt;&lt;/script&gt; --}}
+@endpush
+</code></pre>
+
+    <h4>Langkah 5: Konfigurasi Laluan (Route)</h4>
+    <p>Pastikan anda mempunyai route untuk halaman utama yang memerlukan pengesahan. Dalam fail <code>routes/web.php</code>, anda mungkin sudah ada atau boleh tambah/ubah suai route berikut:</p>
+    <pre><code class="language-php">use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController; // Jika anda guna controller
+
+// Laluan untuk halaman utama selepas log masuk
+Route::get('/home', [HomeController::class, 'index'])
+    ->middleware(['auth']) // Pastikan pengguna telah log masuk
+    ->name('home'); // Beri nama pada route
+
+// Jika belum ada HomeController, anda boleh cipta dengan: php artisan make:controller HomeController
+// Dan dalam HomeController, kaedah index boleh memaparkan view home:
+// public function index() { return view('home'); }
+
+// Atau, jika anda tidak menggunakan controller untuk route mudah ini:
+// Route::get('/home', function () {
+//     return view('home');
+// })->middleware(['auth'])->name('home');
+
+// Pastikan juga route pengesahan asas dari Laravel UI atau Breeze/Jetstream berfungsi
+// Auth::routes(); // Untuk Laravel UI
+</code></pre>
+    <div class="note">
+        <p>Jika anda menggunakan Laravel Breeze atau Jetstream, route <code>/dashboard</code> mungkin merupakan route lalai selepas log masuk, bukan <code>/home</code>. Sesuaikan mengikut scaffolding pengesahan yang anda gunakan.</p>
+    </div>
+
+    <h4>Kesimpulan</h4>
+    <p>Dengan menyusun struktur Blade menggunakan templat AdminLTE, pelajar dapat membina antaramuka sistem yang kemas, konsisten dan mesra pengguna. Modul ini juga melatih pelajar memisahkan antara komponen tetap (layout, sidebar, header, footer) dengan kandungan dinamik (<code>@yield('content')</code>), selari dengan amalan pembangunan sistem berskala industri.</p>
+    <hr>
+
+
+    <nav class="back-to-top-container" aria-label="Navigasi halaman">
+      <a href="#content" class="back-to-top-button" id="backToTopBtn">⬆️ Kembali ke atas</a>
+    </nav>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const backToTopButton = document.getElementById('backToTopBtn');
+
+      if (backToTopButton) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 300) {
+            backToTopButton.style.display = 'inline-block';
+          } else {
+            // backToTopButton.style.display = 'none'; // Boleh diaktifkan jika mahu sembunyi
+          }
+        });
+
+        backToTopButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          } else {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+          }
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
