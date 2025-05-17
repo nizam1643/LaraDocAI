@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modul 2: Antaramuka Dinamik dan CRUD Interaktif</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f7f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 20px 40px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            border-left: 6px solid #3498db;
+            padding-left: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        pre {
+            background: #f1f1f1;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .note {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-left: 5px solid #f39c12;
+            margin: 20px 0;
+        }
+
+        .back-to-top-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 40px;
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Modul 2: Antaramuka Dinamik dan CRUD Interaktif</h1>
+    </header>
+    <main id="content">
+        <h2>Hasil Pembelajaran</h2>
+        <p>Pelajar dapat membina antaramuka pengguna yang dinamik menggunakan JavaScript serta melaksanakan operasi CRUD
+            secara interaktif menggunakan AJAX tanpa perlu muat semula halaman.</p>
+        <hr>
+
+        <h3>Bab 2.1: Cipta Model dan Migration Pelajar</h3>
+        <p>Jalankan arahan berikut untuk mencipta model dan migration:</p>
+        <pre><code>php artisan make:model Pelajar -m</code></pre>
+
+        <p>Selepas mencipta model <code>Pelajar</code>, anda perlu menetapkan senarai atribut yang dibenarkan untuk
+            diisi secara pukal. Ini bertujuan untuk memastikan keselamatan semasa menerima data daripada pengguna
+            melalui borang.</p>
+
+        <p>Buka fail <code>app/Models/Pelajar.php</code> dan kemas kini kandungan seperti berikut:</p>
+
+        <pre><code>namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Pelajar extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'nama',
+        'emel',
+        'program',
+    ];
+}
+</code></pre>
+
+        <p><strong>Penjelasan:</strong> Senarai <code>$fillable</code> digunakan oleh Laravel untuk menentukan medan
+            mana yang dibenarkan menerima data semasa pemanggilan seperti
+            <code>Pelajar::create($request-&gt;all())</code>. Jika medan tidak dinyatakan dalam <code>$fillable</code>,
+            Laravel akan mengabaikan atau menolak data tersebut bagi mengelakkan sebarang isu keselamatan.</p>
+
+        <p>Kemaskini migration di <code>database/migrations/xxxx_create_pelajars_table.php</code>:</p>
+        <pre><code>Schema::create('pelajars', function (Blueprint $table) {
+    $table->id();
+    $table->string('nama');
+    $table->string('emel')->unique();
+    $table->string('program');
+    $table->timestamps();
+});</code></pre>
+
+        <p>Jalankan migrasi:</p>
+        <pre><code>php artisan migrate</code></pre>
+
+        <h3>Bab 2.2: Sediakan Controller CRUD</h3>
+        <p>Cipta controller:</p>
+        <pre><code>php artisan make:controller PelajarController</code></pre>
+
+        <p>Isi kandungan <code>app/Http/Controllers/PelajarController.php</code>:</p>
+        <pre><code>use App\Models\Pelajar;
+use Illuminate\Http\Request;
+
+class PelajarController extends Controller
+{
+    public function index() {
+        return view('pelajar.index');
+    }
+
+    public function list() {
+        return response()->json(Pelajar::all());
+    }
+
+    public function store(Request $request) {
+        $request->validate([
+            'nama' => 'required',
+            'emel' => 'required|email|unique:pelajars',
+            'program' => 'required',
+        ]);
+        return Pelajar::create($request->all());
+    }
+
+    public function show($id) {
+        return Pelajar::findOrFail($id);
+    }
+
+    public function update(Request $request, $id) {
+        $pelajar = Pelajar::findOrFail($id);
+        $pelajar->update($request->all());
+        return $pelajar;
+    }
+
+    public function destroy($id) {
+        Pelajar::destroy($id);
+        return response()->json(['status' => 'deleted']);
+    }
+}</code></pre>
+
+        <h3>Bab 2.3: Laluan Web</h3>
+        <p>Dalam <code>routes/web.php</code>, tambahkan laluan berikut:</p>
+        <pre><code>use App\Http\Controllers\PelajarController;
+
+Route::get('/pelajar', [PelajarController::class, 'index']);
+Route::get('/pelajar/list', [PelajarController::class, 'list']);
+Route::post('/pelajar', [PelajarController::class, 'store']);
+Route::get('/pelajar/{id}', [PelajarController::class, 'show']);
+Route::put('/pelajar/{id}', [PelajarController::class, 'update']);
+Route::delete('/pelajar/{id}', [PelajarController::class, 'destroy']);</code></pre>
+
+        <h3>Bab 2.4: View dengan Modal Bootstrap dan AJAX Interaktif</h3>
+        <p>Cipta fail <code>resources/views/pelajar/index.blade.php</code> dan masukkan kod berikut:</p>
+        <pre><code>@extends('layouts.app')
+
+@section('title', 'Senarai Pelajar')
+@section('page_title', 'Pelajar')
+
+@section('content')
+&lt;button class="btn btn-primary mb-3" onclick="bukaModal()"&gt;Tambah Pelajar&lt;/button&gt;
+&lt;table class="table table-bordered"&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Nama&lt;/th&gt;&lt;th&gt;Emel&lt;/th&gt;&lt;th&gt;Program&lt;/th&gt;&lt;th&gt;Tindakan&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody id="senarai"&gt;&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;div class="modal fade" id="modalPelajar"&gt;
+  &lt;div class="modal-dialog"&gt;
+    &lt;form id="borangPelajar" class="modal-content needs-validation" novalidate&gt;
+      @csrf
+      &lt;div class="modal-header bg-primary text-white"&gt;&lt;h5 class="modal-title"&gt;Pelajar&lt;/h5&gt;&lt;/div&gt;
+      &lt;div class="modal-body"&gt;
+        &lt;input type="hidden" id="pelajarId"&gt;
+        &lt;div class="form-group"&gt;
+          &lt;label&gt;Nama&lt;/label&gt;
+          &lt;input name="nama" type="text" class="form-control" required&gt;
+          &lt;div class="invalid-feedback"&gt;Nama wajib diisi&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="form-group"&gt;
+          &lt;label&gt;Emel&lt;/label&gt;
+          &lt;input name="emel" type="email" class="form-control" required&gt;
+          &lt;div class="invalid-feedback"&gt;Emel sah diperlukan&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="form-group"&gt;
+          &lt;label&gt;Program&lt;/label&gt;
+          &lt;input name="program" type="text" class="form-control" required&gt;
+          &lt;div class="invalid-feedback"&gt;Sila isikan program&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div id="ralat" class="alert alert-danger d-none"&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="modal-footer"&gt;
+        &lt;button type="submit" class="btn btn-success"&gt;Simpan&lt;/button&gt;
+        &lt;button type="button" class="btn btn-secondary" data-dismiss="modal"&gt;Tutup&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+@endsection
+
+@push('scripts')
+&lt;script&gt;
+function bukaModal(id = null) {
+  const form = document.getElementById('borangPelajar');
+  form.reset();
+  form.classList.remove('was-validated');
+  document.getElementById('ralat').classList.add('d-none');
+  document.getElementById('pelajarId').value = '';
+  if (id) {
+    fetch(`/pelajar/${id}`).then(r =&gt; r.json()).then(d =&gt; {
+      form.nama.value = d.nama;
+      form.emel.value = d.emel;
+      form.program.value = d.program;
+      document.getElementById('pelajarId').value = d.id;
+    });
+  }
+  $('#modalPelajar').modal('show');
+}
+
+document.getElementById('borangPelajar').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = this;
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  const id = document.getElementById('pelajarId').value;
+  const data = {
+    nama: form.nama.value,
+    emel: form.emel.value,
+    program: form.program.value
+  };
+
+  fetch(id ? `/pelajar/${id}` : '/pelajar', {
+    method: id ? 'PUT' : 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    },
+    body: JSON.stringify(data)
+  }).then(async r =&gt; {
+    if (!r.ok) {
+      const msg = await r.text();
+      document.getElementById('ralat').textContent = msg;
+      document.getElementById('ralat').classList.remove('d-none');
+      return;
+    }
+    $('#modalPelajar').modal('hide');
+    loadPelajar();
+  });
+});
+
+function loadPelajar() {
+  fetch('/pelajar/list')
+    .then(res =&gt; res.json())
+    .then(data =&gt; {
+      let isi = '';
+      data.forEach(p =&gt; {
+        isi += `&lt;tr&gt;&lt;td&gt;${p.nama}&lt;/td&gt;&lt;td&gt;${p.emel}&lt;/td&gt;&lt;td&gt;${p.program}&lt;/td&gt;
+          &lt;td&gt;
+            &lt;button class="btn btn-sm btn-warning" onclick="bukaModal(${p.id})"&gt;Edit&lt;/button&gt;
+            &lt;button class="btn btn-sm btn-danger" onclick="padam(${p.id})"&gt;Padam&lt;/button&gt;
+          &lt;/td&gt;&lt;/tr&gt;`;
+      });
+      document.getElementById('senarai').innerHTML = isi;
+    });
+}
+
+function padam(id) {
+  if (!confirm('Padam pelajar ini?')) return;
+  fetch(`/pelajar/${id}`, {
+    method: 'DELETE',
+    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+  }).then(() =&gt; loadPelajar());
+}
+
+loadPelajar();
+&lt;/script&gt;
+@endpush</code></pre>
+
+        <h3>Bab 2.5: Penilaian</h3>
+        <ul>
+            <li>Semua input menunjukkan status validasi semasa ditaip</li>
+            <li>Operasi tambah, kemas kini dan hapus berlaku secara AJAX</li>
+            <li>Data dipaparkan serta-merta tanpa perlu refresh halaman</li>
+        </ul>
+
+        <div class="note">
+            <p><strong>Nota:</strong> AJAX dalam Laravel memerlukan CSRF token. Pastikan <code>{{ csrf_token() }}</code>
+                dihantar melalui header semasa permintaan <code>POST</code>, <code>PUT</code>, dan <code>DELETE</code>.
+            </p>
+        </div>
+
+        <a href="#content" class="back-to-top-button">⬆️ Kembali ke atas</a>
+    </main>
+</body>
+
+</html>
