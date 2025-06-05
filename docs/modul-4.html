@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modul 4: Penjana Dokumentasi Tersuai menggunakan OpenAI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f7f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2c3e50;
+            /* Warna Hijau OpenAI yang lebih segar */
+            color: #fff;
+            padding: 20px 40px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            border-left: 6px solid #007ACC;
+            /* Biru API */
+            padding-left: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        pre {
+            background: #2d2d2d;
+            /* Latar gelap untuk kod */
+            color: #f1f1f1;
+            padding: 20px;
+            border-left: 4px solid #007ACC;
+            /* Biru API */
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border-radius: 4px;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        .note {
+            background-color: #e6fff3;
+            /* Latar nota hijau lembut */
+            padding: 15px;
+            border-left: 5px solid #28a745;
+            /* Hijau Nota */
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .command {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        .code-filename {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: -15px;
+            padding-left: 5px;
+            font-style: italic;
+        }
+
+        .back-to-top-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007ACC;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 40px;
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Modul 4: Penjana Dokumentasi Tersuai menggunakan OpenAI</h1>
+    </header>
+    <main id="content">
+        <h2>Hasil Pembelajaran</h2>
+        <p>Pelajar dapat menjana dokumentasi sistem secara automatik menggunakan OpenAI dan memaparkannya dalam
+            antaramuka web.</p>
+        <hr>
+
+        <h2>Pengenalan</h2>
+        <p>Mendokumentasikan sistem perisian adalah kritikal tetapi sering diabaikan kerana ia memakan masa. Dengan
+            kemajuan API seperti OpenAI, kita boleh mengautomasikan sebahagian besar proses ini. Modul ini akan
+            membimbing anda untuk membina satu perintah Artisan Laravel yang mengimbas kod anda, menghantar maklumat
+            kepada OpenAI, dan menyimpan dokumentasi yang dijana ke dalam pangkalan data untuk paparan web.</p>
+
+        <h3>Bab 4.1: Persediaan Awal</h3>
+        <h4>1. Pemasangan Pakej OpenAI Laravel</h4>
+        <p>Pastikan anda telah memasang pakej rasmi OpenAI untuk Laravel:</p>
+        <pre><code class="language-bash">composer require openai-php/laravel</code></pre>
+        <p>Kemudian, terbitkan fail konfigurasi:</p>
+        <pre><code class="language-bash">php artisan vendor:publish --provider="OpenAI\Laravel\ServiceProvider"</code></pre>
+        <p>Akhir sekali, tambahkan kunci API OpenAI anda dalam fail <code class="command">.env</code>:</p>
+        <pre><code class="language-bash">OPENAI_API_KEY=sk-...
+OPENAI_ORGANIZATION=... # Pilihan</code></pre>
+
+        <h4>2. Model dan Migration untuk Dokumentasi</h4>
+        <p>Kita memerlukan satu jadual untuk menyimpan entri dokumentasi. Cipta model dan migration:</p>
+        <pre><code class="language-bash">php artisan make:model DocumentationEntry -m</code></pre>
+
+        <p>Kemas kini fail migration (<code
+                class="command">database/migrations/xxxx_create_documentation_entries_table.php</code>):</p>
+        <div class="code-filename">database/migrations/xxxx_create_documentation_entries_table.php</div>
+        <pre><code class="language-php">&lt;?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('documentation_entries', function (Blueprint $table) {
+            $table-&gt;id();
+            $table-&gt;string('class_name')-&gt;unique(); // Pastikan nama kelas unik
+            $table-&gt;text('source_path');
+            $table-&gt;json('metadata')-&gt;nullable(); // Untuk menyimpan ringkasan JSON
+            $table-&gt;longText('documentation'); // Dokumentasi yang dijana OpenAI
+            $table-&gt;timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('documentation_entries');
+    }
+};</code></pre>
+
+        <p>Jalankan migrasi:</p>
+        <pre><code class="language-bash">php artisan migrate</code></pre>
+
+        <p>Kemas kini model <code class="command">DocumentationEntry</code> (<code
+                class="command">app/Models/DocumentationEntry.php</code>):</p>
+        <div class="code-filename">app/Models/DocumentationEntry.php</div>
+        <pre><code class="language-php">&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class DocumentationEntry extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'class_name',
+        'source_path',
+        'metadata',
+        'documentation'
+    ];
+
+    protected $casts = [
+        'metadata' => 'array', // Penting untuk menukar JSON ke array dan sebaliknya
+    ];
+}
+</code></pre>
+
+        <h3>Bab 4.2: Pembinaan Artisan Command: <code class="command">generate:docs</code></h3>
+        <p>Cipta satu perintah Artisan baharu:</p>
+        <pre><code class="language-bash">php artisan make:command GenerateDocumentation</code></pre>
+        <p>Buka fail <code class="command">app/Console/Commands/GenerateDocumentation.php</code> dan kemas kini
+            kandungannya. Perintah ini akan:</p>
+        <ul>
+            <li>Mengimbas direktori <code class="command">app/Http/Controllers</code>.</li>
+            <li>Untuk setiap fail controller:
+                <ul>
+                    <li>Mengekstrak nama kelas, namespace, dan metod awam menggunakan Refleksi PHP.</li>
+                    <li>Mengesank fail view, model, ujian, dan factory yang berkaitan.</li>
+                    <li>Membina satu ringkasan JSON mengenai controller tersebut.</li>
+                    <li>Menghantar ringkasan ini kepada API OpenAI dengan prompt yang terperinci untuk menjana
+                        dokumentasi dalam format Markdown.</li>
+                    <li>Menyimpan dokumentasi yang diterima ke dalam jadual <code
+                            class="command">documentation_entries</code>.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <div class="code-filename">app/Console/Commands/GenerateDocumentation.php</div>
+        <pre><code class="language-php">&lt;?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use App\Models\DocumentationEntry;
+use OpenAI\Laravel\Facades\OpenAI; // Pastikan menggunakan Facade yang betul
+use ReflectionClass;
+use ReflectionMethod;
+use Illuminate\Support\Str; // Untuk manipulasi string
+
+class GenerateDocumentation extends Command
+{
+    protected $signature = 'generate:docs';
+    protected $description = 'Generate system documentation using OpenAI and save to database';
+
+    public function handle()
+    {
+        $this-&gt;info('Starting documentation generation...');
+        // Anda boleh menambah direktori lain seperti Services, Models, dll.
+        $controllerFiles = File::allFiles(app_path('Http/Controllers'));
+        // $serviceFiles = File::allFiles(app_path('Services'));
+        // $allFiles = array_merge($controllerFiles, $serviceFiles);
+
+        foreach ($controllerFiles as $file) { // Tukar kepada $allFiles jika mahu lebih
+            $path = $file-&gt;getRealPath();
+            $classContent = File::get($path);
+            
+            $namespace = $this-&gt;getNamespace($classContent);
+            $className = $this-&gt;getClassName($classContent);
+
+            if (empty($namespace) || empty($className)) {
+                $this-&gt;warn("Could not determine namespace or class name for: {$path}");
+                continue;
+            }
+
+            $fqcn = $namespace . '\\' . $className; // Fully Qualified Class Name
+
+            // Sesetengah kelas mungkin tidak dimuatkan secara automatik
+            if (!class_exists($fqcn, false)) { // 'false' untuk tidak autoload
+                 require_once $path;
+            }
+            
+            if (!class_exists($fqcn)) {
+                $this-&gt;warn("Class {$fqcn} not found after requiring path. Skipping.");
+                continue;
+            }
+
+            $this-&gt;line("Processing: {$fqcn}");
+
+            try {
+                $reflection = new ReflectionClass($fqcn);
+                // Hanya metod yang didefinisikan dalam kelas ini, bukan dari parent class
+                $methods = collect($reflection-&gt;getMethods(ReflectionMethod::IS_PUBLIC))
+                    -&gt;filter(fn($m) =&gt; $m-&gt;getDeclaringClass()-&gt;getName() === $fqcn)
+                    -&gt;map(fn($m) =&gt; $m-&gt;getName())
+                    -&gt;values()-&gt;all();
+
+                $views = $this-&gt;detectViewFiles($classContent);
+                $models = $this-&gt;detectModelFiles($classContent);
+                $tests = $this-&gt;detectTestFiles($className);
+                $factories = $this-&gt;detectFactoryFiles($models);
+
+                $summary = [
+                    'class_name' => $fqcn,
+                    'file_path' => Str::replaceFirst(base_path() . DIRECTORY_SEPARATOR, '', $path),
+                    'methods' => $methods,
+                    'associated_views' => $views,
+                    'associated_models' => $models,
+                    'associated_test_files' => $tests,
+                    'associated_factory_files' => $factories,
+                ];
+                
+                $jsonSummary = json_encode($summary, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+                $prompt = "Anda adalah seorang penulis teknikal pakar Laravel. Tugas anda adalah untuk menjana dokumentasi teknikal yang jelas dan profesional dalam format Markdown untuk kelas Controller Laravel yang diberikan berdasarkan nama kelasnya, laluan fail, metod-metod, serta fail-fail view, model, ujian, dan factory yang berkaitan.\n\n";
+                $prompt .= "Sila ikut struktur ini:\n";
+                $prompt .= "1.  **Nama Kelas (Class Name)** – Nama kelas penuh beserta namespace.\n";
+                $prompt .= "2.  **Laluan Fail (File Path)** – Lokasi fail controller.\n";
+                $prompt .= "3.  **Penerangan (Description)** – Ringkasan tujuan controller dalam 2-3 ayat.\n";
+                $prompt .= "4.  **Gambaran Keseluruhan Metod (Methods Overview)** – Senaraikan setiap metod dalam kelas dengan:\n";
+                $prompt .= "    - Nama metod\n";
+                $prompt .= "    - Tujuan (berdasarkan nama metod dan konteks kelas)\n";
+                $prompt .= "    - Parameter (jika dapat dikesan atau inferens umum)\n";
+                $prompt .= "    - Nilai Pulangan (apa yang mungkin dipulangkan, cth: View, JSON, Redirect)\n";
+                $prompt .= "5.  **Model Digunakan (Used Models)** – Senaraikan dan terangkan setiap model Eloquent yang digunakan dalam controller.\n";
+                $prompt .= "6.  **View Digunakan (Used Views)** – Senaraikan fail view Blade yang di-render, dan terangkan secara ringkas apa yang dipaparkan.\n";
+                $prompt .= "7.  **Fail Ujian Berkaitan (Associated Test Files)** – Nyatakan jika controller ini diliputi oleh ujian.\n";
+                $prompt .= "8.  **Fail Factory (Factory Files)** – Nyatakan fail factory yang berkaitan dan tujuannya.\n\n";
+                $prompt .= "Pastikan penjelasan jelas dan membantu untuk pembangun junior atau ahli pasukan baharu. Formatkan output dengan kemas dalam Markdown.\n\n";
+                $prompt .= "Berikut adalah ringkasan JSON mengenai kelas tersebut:\n\n";
+                $prompt .= "```json\n" . $jsonSummary . "\n```";
+
+                $this-&gt;line("Sending request to OpenAI for {$fqcn}...");
+                $openaiResponse = OpenAI::chat()-&gt;create([
+                    'model' => 'gpt-4', // Atau gpt-3.5-turbo jika bajet terhad
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Anda adalah penjana dokumentasi perisian yang sangat mahir.'],
+                        ['role' => 'user', 'content' => $prompt]
+                    ],
+                ]);
+
+                $documentationContent = $openaiResponse-&gt;choices[0]-&gt;message-&gt;content;
+
+                DocumentationEntry::updateOrCreate(
+                    ['class_name' => $fqcn],
+                    [
+                        'source_path' => $path,
+                        'metadata' => $summary, // Simpan array, bukan JSON string
+                        'documentation' => $documentationContent,
+                    ]
+                );
+
+                $this-&gt;info("Dokumentasi dijana dan disimpan untuk: {$fqcn}");
+
+            } catch (\Exception $e) {
+                $this-&gt;error("Gagal memproses {$fqcn}: " . $e-&gt;getMessage());
+            }
+             $this-&gt;line("--------------------------------------------------");
+        }
+        $this-&gt;info('Documentation generation complete!');
+        return 0; // Berjaya
+    }
+
+    // Fungsi bantuan (helper functions)
+    protected function getNamespace($content)
+    {
+        if (preg_match('/namespace\s+([^;]+);/m', $content, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+
+    protected function getClassName($content)
+    {
+        if (preg_match('/class\s+(\w+)/m', $content, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+
+    protected function detectViewFiles($content)
+    {
+        // Mencari view('nama.view') atau View::make('nama.view')
+        preg_match_all('/(?:view|View::make)\s*\(\s*[\'"]([a-zA-Z0-9_.-]+)[\'"]/', $content, $matches);
+        return array_unique($matches[1] ?? []);
+    }
+
+    protected function detectModelFiles($content)
+    {
+        // Mencari `use App\Models\NamaModel;` atau `new NamaModel(` atau `NamaModel::`
+        preg_match_all('/(?:use\s+App\\\Models\\\([A-Za-z0-9_]+);|new\s+([A-Z][A-Za-z0-9_]+)\s*\(|([A-Z][A-Za-z0-9_]+)::)/m', $content, $matches);
+        $models = array_filter(array_merge($matches[1], $matches[2], $matches[3]));
+        // Saring untuk memastikan hanya model yang wujud di App/Models
+        return collect($models)-&gt;unique()-&gt;filter(function ($modelName) {
+            return File::exists(app_path("Models/{$modelName}.php"));
+        })-&gt;values()-&gt;all();
+    }
+    
+    protected function detectTestFiles($className)
+    {
+        $potentialTestName = $className . 'Test.php';
+        $featureTestPath = base_path("tests/Feature/{$potentialTestName}");
+        $unitTestPath = base_path("tests/Unit/{$potentialTestName}");
+        
+        $foundTests = [];
+        if (File::exists($featureTestPath)) {
+            $foundTests[] = Str::replaceFirst(base_path() . DIRECTORY_SEPARATOR, '', $featureTestPath);
+        }
+        if (File::exists($unitTestPath)) {
+            $foundTests[] = Str::replaceFirst(base_path() . DIRECTORY_SEPARATOR, '', $unitTestPath);
+        }
+        return $foundTests;
+    }
+
+    protected function detectFactoryFiles($models)
+    {
+        return collect($models)
+            -&gt;map(fn($model) =&gt; "database/factories/{$model}Factory.php")
+            -&gt;filter(fn($path) =&gt; File::exists(base_path($path)))
+            -&gt;values()
+            -&gt;all();
+    }
+}
+</code></pre>
+        <div class="note">
+            <p><strong>Nota Penting:</strong></p>
+            <ul>
+                <li>Fungsi <code class="command">detectModelFiles</code>, <code class="command">detectViewFiles</code>,
+                    <code class="command">detectTestFiles</code>, dan <code class="command">detectFactoryFiles</code>
+                    menggunakan ekspresi reguler (regex) asas. Ia mungkin memerlukan penambahbaikan untuk meliputi semua
+                    kes atau jika struktur projek anda berbeza.</li>
+                <li>Penggunaan OpenAI API melibatkan kos. Pastikan anda memantau penggunaan anda. Model <code
+                        class="command">gpt-4</code> memberikan hasil yang lebih baik tetapi lebih mahal berbanding
+                    <code class="command">gpt-3.5-turbo</code>.</li>
+                <li>Proses ini mungkin mengambil masa yang lama jika anda mempunyai banyak fail controller.
+                    Pertimbangkan untuk melaksanakannya sebagai tugasan berjadual (scheduled task) atau menambah pilihan
+                    untuk menjana dokumentasi bagi fail tertentu sahaja.</li>
+            </ul>
+        </div>
+
+        <h3>Bab 4.3: Paparan Dokumentasi melalui Templat Blade</h3>
+        <p>Kita memerlukan satu controller dan route untuk memaparkan dokumentasi yang telah disimpan.</p>
+        <h4>1. Cipta Controller Paparan</h4>
+        <pre><code class="language-bash">php artisan make:controller DocumentationController</code></pre>
+        <p>Kemas kini <code class="command">app/Http/Controllers/DocumentationController.php</code>:</p>
+        <div class="code-filename">app/Http/Controllers/DocumentationController.php</div>
+        <pre><code class="language-php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\DocumentationEntry;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str; // Untuk Markdown parser
+
+class DocumentationController extends Controller
+{
+    public function index()
+    {
+        // Ambil semua entri, susun mengikut nama kelas
+        $docs = DocumentationEntry::orderBy('class_name')-&gt;get();
+        
+        // Tukar Markdown ke HTML untuk setiap entri dokumentasi
+        // Anda mungkin mahu buat ini hanya apabila entri itu dipaparkan
+        // untuk mengelakkan pemprosesan berlebihan jika banyak entri.
+        // Di sini kita akan buat di controller untuk memudahkan templat Blade.
+        $docs-&gt;transform(function ($doc) {
+            // Gantikan blok kod Markdown dengan tag pre yang digayakan
+            $doc-&gt;documentation_html = Str::markdown($doc-&gt;documentation);
+            // Contoh penggantian asas untuk blok kod:
+            // Regex ini mungkin perlu diperhalusi
+            $doc-&gt;documentation_html = preg_replace_callback(
+                '/&lt;pre&gt;&lt;code(?: class="language-(.*?)")?&gt;(.*?)&lt;\/code&gt;&lt;\/pre&gt;/s',
+                function ($matches) {
+                    $language = $matches[1] ?? 'plaintext';
+                    $code = htmlspecialchars_decode($matches[2]); // Decode HTML entities
+                    return '&lt;div class="code-block language-'.e($language).'"&gt;&lt;pre&gt;&lt;code&gt;'.e($code).'&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;';
+                },
+                $doc-&gt;documentation_html
+            );
+            return $doc;
+        });
+
+        return view('docs.index', ['docs' => $docs]);
+    }
+}
+</code></pre>
+        <div class="note">
+            <p><strong>Pustaka Markdown:</strong> Secara lalai, <code class="command">Str::markdown()</code> menggunakan
+                pustaka CommonMark. Untuk penyerlahan sintaks atau ciri lanjutan, anda mungkin perlu memasang dan
+                mengkonfigurasi pustaka Markdown yang lebih berkuasa seperti <code
+                    class="command">Spatie/laravel-markdown</code>.</p>
+        </div>
+
+        <h4>2. Tentukan Route</h4>
+        <p>Tambah route dalam <code class="command">routes/web.php</code>:</p>
+        <div class="code-filename">routes/web.php</div>
+        <pre><code class="language-php">use App\Http\Controllers\DocumentationController;
+
+Route::get('/docs', [DocumentationController::class, 'index'])-&gt;name('docs.index');
+</code></pre>
+
+        <h4>3. Bina Templat Blade</h4>
+        <p>Cipta fail view di <code class="command">resources/views/docs/index.blade.php</code>. Gunakan HTML dan CSS
+            yang telah anda sediakan. Pastikan anda memaparkan <code class="command">$doc->documentation_html</code>
+            (yang telah diproses dari Markdown ke HTML) dan bukan <code class="command">$doc->documentation</code>
+            (Markdown mentah).</p>
+        <p>Gantikan bahagian paparan dokumentasi dalam HTML anda (<code
+                class="command">&lt;div class="code-block"&gt;{{ $doc-&gt;documentation }}&lt;/div&gt;</code>) dengan:
+        </p>
+        <pre><code class="language-html">{!! $doc-&gt;documentation_html !!}</code></pre>
+        <p>Menggunakan <code class="command">{!! ... !!}</code> adalah perlu untuk memaparkan HTML mentah. Pastikan
+            output OpenAI anda adalah selamat dan tidak mengandungi skrip berniat jahat jika sumbernya tidak dipercayai.
+            Dalam kes ini, ia adalah output yang anda kawal melalui prompt, jadi risikonya lebih rendah.</p>
+
+        <div class="code-filename">resources/views/docs/index.blade.php (Contoh Kerangka)</div>
+        <pre><code class="language-html">
+@extends('layouts.app') {{-- Atau templat utama anda --}}
+
+@section('title', 'Dokumentasi Sistem')
+
+@section('content')
+    {{-- Masukkan keseluruhan struktur HTML yang anda berikan di sini --}}
+    {{-- Pastikan untuk menggantikan bahagian gelung @foreach dan paparan dokumentasi --}}
+
+    &lt;!-- ... (bahagian atas HTML anda: header, search, stats) ... --&gt;
+
+            &lt;div id="docsContainer"&gt;
+                @forelse ($docs as $doc)
+                    &lt;div class="doc-section" data-search="{{ strtolower($doc-&gt;class_name . ' ' . $doc-&gt;documentation) }}"&gt;
+                        &lt;div class="doc-header" onclick="toggleDoc(this)"&gt;
+                            &lt;div class="doc-title"&gt;
+                                &lt;span class="doc-badge"&gt;
+                                    {{-- Logik untuk badge berdasarkan nama kelas --}}
+                                    @if (Str::contains(strtolower($doc-&gt;class_name), 'controller'))
+                                        CONTROLLER
+                                    @elseif (Str::contains(strtolower($doc-&gt;class_name), 'service'))
+                                        SERVICE
+                                    @elseif (Str::contains(strtolower($doc-&gt;class_name), 'model'))
+                                        MODEL
+                                    @else
+                                        CLASS
+                                    @endif
+                                &lt;/span&gt;
+                                {{ $doc-&gt;class_name }}
+                            &lt;/div&gt;
+                            &lt;span class="collapse-icon"&gt;▼&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="doc-content"&gt;
+                            &lt;div class="doc-body"&gt;
+                                &lt;div class="doc-meta"&gt;
+                                    &lt;div class="meta-title"&gt;📋 Maklumat Kelas&lt;/div&gt;
+                                    &lt;div class="meta-content"&gt;
+                                        &lt;strong&gt;Nama Kelas:&lt;/strong&gt; {{ $doc-&gt;class_name }}&lt;br&gt;
+                                        &lt;strong&gt;Laluan Sumber:&lt;/strong&gt; {{ $doc-&gt;source_path }}&lt;br&gt;
+                                        &lt;strong&gt;Dijana pada:&lt;/strong&gt; {{ $doc-&gt;updated_at ? $doc-&gt;updated_at-&gt;format('d M Y, H:i') : 'N/A' }}
+                                    &lt;/div&gt;
+                                &lt;/div&gt;
+
+                                {{-- Paparkan HTML yang telah ditukar dari Markdown --}}
+                                {!! $doc-&gt;documentation_html !!}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                @empty
+                    &lt;div class="no-results"&gt;
+                        &lt;h3&gt;🚫 Tiada dokumentasi dijumpai&lt;/h3&gt;
+                        &lt;p&gt;Sila jalankan perintah &lt;code class="command"&gt;php artisan generate:docs&lt;/code&gt; untuk menjana dokumentasi.&lt;/p&gt;
+                    &lt;/div&gt;
+                @endforelse
+            &lt;/div&gt;
+
+            &lt;div id="noResults" class="no-results" style="display: none;"&gt;
+                &lt;h3&gt;🔍 Tiada hasil carian dijumpai&lt;/h3&gt;
+                &lt;p&gt;Cuba cari dengan kata kunci yang berbeza.&lt;/p&gt;
+            &lt;/div&gt;
+        {{-- ... (bahagian bawah HTML anda: skrip JavaScript) ... --}}
+    &lt;script&gt;
+        // Skrip JavaScript sedia ada anda untuk toggle dan carian
+        function toggleDoc(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.collapse-icon');
+            const isActive = content.classList.contains('active');
+
+            document.querySelectorAll('.doc-content.active').forEach(el => {
+                if (el !== content) {
+                    el.classList.remove('active');
+                    el.previousElementSibling.classList.remove('active');
+                    el.previousElementSibling.querySelector('.collapse-icon').classList.remove('active');
+                }
+            });
+
+            content.classList.toggle('active');
+            header.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const docSections = document.querySelectorAll('.doc-section');
+            const noResults = document.getElementById('noResults');
+            const docsContainer = document.getElementById('docsContainer');
+            let hasResults = false;
+
+            docSections.forEach(section => {
+                const searchData = section.getAttribute('data-search'); // Pastikan data-search ada kandungan yang relevan
+                
+                if (searchData.includes(searchTerm) || searchTerm === '') {
+                    section.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            if (document.querySelector('.no-results h3').textContent.startsWith('🚫')) {
+                 // Jika tiada dokumen langsung, jangan tunjukkan "no search results"
+            } else {
+                docsContainer.style.display = hasResults ? 'block' : 'none';
+                noResults.style.display = hasResults ? 'none' : 'block';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kosongkan semua status aktif dahulu
+            document.querySelectorAll('.doc-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.doc-header').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.collapse-icon').forEach(el => el.classList.remove('active'));
+
+            // Aktifkan bahagian dokumentasi yang pertama jika ada
+            const firstDocHeader = document.querySelector('.doc-header');
+            if (firstDocHeader) {
+                firstDocHeader.classList.add('active');
+                firstDocHeader.nextElementSibling.classList.add('active');
+                firstDocHeader.querySelector('.collapse-icon').classList.add('active');
+            }
+        });
+    &lt;/script&gt;
+@endsection
+</code></pre>
+
+        <h3>Bab 4.4: Aktiviti Pembelajaran</h3>
+        <ol>
+            <li><strong>Bangunkan Perintah Artisan:</strong> Laksanakan kod untuk <code
+                    class="command">GenerateDocumentation.php</code> seperti yang dibincangkan. Uji dengan menjalankan
+                <code class="command">php artisan generate:docs</code>. Semak pangkalan data anda untuk melihat jika
+                entri dokumentasi dicipta.</li>
+            <li><strong>Pratonton Dokumentasi:</strong> Laksanakan controller dan view untuk halaman <code
+                    class="command">/docs</code>. Pastikan dokumentasi yang dijana dipaparkan dengan betul.</li>
+            <li><strong>Penambahbaikan (Pilihan):</strong>
+                <ul>
+                    <li>Tambah lebih banyak jenis fail untuk diimbas (cth., Services, Models, Jobs).</li>
+                    <li>Perhalusi prompt OpenAI untuk mendapatkan hasil yang lebih baik atau format yang berbeza.</li>
+                    <li>Laksanakan bar kemajuan (progress bar) dalam perintah Artisan untuk proses yang panjang.</li>
+                    <li>Tambah pilihan pada perintah Artisan untuk menjana semula dokumentasi bagi kelas tertentu
+                        sahaja.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Bab 4.5: Penilaian</h3>
+        <ul>
+            <li>✅ Perintah <code class="command">php artisan generate:docs</code> berjaya dilaksanakan dan menjana
+                dokumentasi dalam format Markdown yang disimpan sebagai JSON atau teks dalam pangkalan data.</li>
+            <li>✅ Halaman <code class="command">/docs</code> berjaya memaparkan dokumentasi daripada pangkalan data dan
+                boleh dibaca/digunakan dengan baik oleh pengguna akhir (cth., navigasi, carian berfungsi).</li>
+            <li>🧠 Pelajar dapat menerangkan aliran proses daripada pengimbasan fail sehingga paparan dokumentasi,
+                termasuk peranan OpenAI API.</li>
+        </ul>
+
+        <a href="#content" class="back-to-top-button">⬆️ Kembali ke atas</a>
+    </main>
+</body>
+
+</html>
