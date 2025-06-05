@@ -16,7 +16,6 @@ class RolePermissionSeeder extends Seeder
     {
         $rolePermissionLists = [
             'admin',
-            'staff',
             'student'
         ];
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookCategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,12 +21,13 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/admin', [App\Http\Controllers\HomeController::class, 'admin'])->name('admin');
+Route::get('/student', [App\Http\Controllers\HomeController::class, 'student'])->name('student');
 
-use App\Http\Controllers\PelajarController;
 
-Route::get('/pelajar/index', [PelajarController::class, 'index']);
-Route::get('/pelajar/list', [PelajarController::class, 'list']);
-Route::post('/pelajar', [PelajarController::class, 'store']);
-Route::get('/pelajar/{id}', [PelajarController::class, 'show']);
-Route::put('/pelajar/{id}', [PelajarController::class, 'update']);
-Route::delete('/pelajar/{id}', [PelajarController::class, 'destroy']);
+Route::get('/book-category/index', [BookCategoryController::class, 'index']);
+Route::get('/book-category/list', [BookCategoryController::class, 'list']);
+Route::post('/book-category', [BookCategoryController::class, 'store']);
+Route::get('/book-category/{id}', [BookCategoryController::class, 'show']);
+Route::put('/book-category/{id}', [BookCategoryController::class, 'update']);
+Route::delete('/book-category/{id}', [BookCategoryController::class, 'destroy']);
