@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modul 3: Pengujian Unit menggunakan PHPUnit / Pest</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f7f7f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2C3D4F;
+            /* Biru Laravel */
+            color: #fff;
+            padding: 20px 40px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            border-left: 6px solid #3498DA;
+            /* Merah PHPUnit/Pest */
+            padding-left: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        pre {
+            background: #2d2d2d;
+            /* Latar gelap untuk kod */
+            color: #f1f1f1;
+            padding: 20px;
+            border-left: 4px solid #3498DA;
+            /* Merah PHPUnit/Pest */
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border-radius: 4px;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        .note {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-left: 5px solid #f39c12;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .command {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        .back-to-top-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 40px;
+            float: right;
+        }
+
+        .code-filename {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: -15px;
+            padding-left: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Modul 3: Pengujian Unit menggunakan PHPUnit / Pest</h1>
+    </header>
+    <main id="content">
+        <h2>Hasil Pembelajaran</h2>
+        <p>Pelajar dapat menulis dan menjalankan ujian unit terhadap model dan controller dalam Laravel menggunakan
+            PHPUnit atau Pest.</p>
+        <hr>
+
+        <h2>Pengenalan</h2>
+        <p>Pengujian adalah bahagian penting dalam kitaran pembangunan perisian. Ia memastikan kod berfungsi seperti
+            yang dijangkakan dan membantu mengesan pepijat (bugs) lebih awal. Dalam Laravel, PHPUnit telah sedia
+            terpasang. Pest pula adalah lapisan tambahan di atas PHPUnit yang menawarkan sintaks yang lebih ekspresif
+            dan mudah dibaca.</p>
+
+        <h3>Bab 3.1: Pengenalan kepada Perintah <code class="command">php artisan test</code></h3>
+        <p>Laravel menyediakan perintah Artisan yang mudah untuk menjalankan ujian anda. Cukup dengan menjalankan
+            perintah berikut di terminal anda dari direktori root projek:</p>
+        <pre><code class="language-bash">php artisan test</code></pre>
+        <p>Perintah ini akan menjalankan semua ujian yang terdapat dalam direktori <code class="command">tests</code>
+            anda. Anda juga boleh menjalankan fail ujian tertentu atau metod ujian tertentu.</p>
+        <ul>
+            <li>Menjalankan semua ujian dalam satu fail:
+                <pre><code class="language-bash">php artisan test tests/Feature/BookCategoryControllerTest.php</code></pre>
+            </li>
+            <li>Menjalankan metod ujian spesifik:
+                <pre><code class="language-bash">php artisan test --filter=test_can_store_book_category</code></pre>
+            </li>
+        </ul>
+
+        <h3>Bab 3.2: Pemasangan dan Konfigurasi Asas Pest (Pilihan)</h3>
+        <p>Jika anda memilih untuk menggunakan Pest, anda boleh memasangnya melalui Composer:</p>
+        <pre><code class="language-bash">composer require pestphp/pest --dev --with-all-dependencies
+php artisan pest:install</code></pre>
+        <p>Selepas pemasangan, anda boleh menjalankan ujian Pest dengan perintah yang sama, <code
+                class="command">php artisan test</code>. Laravel akan mengesan Pest secara automatik.</p>
+        <div class="note">
+            <p><strong>Nota:</strong> Untuk modul ini, contoh kod akan menggunakan sintaks PHPUnit yang sedia ada dalam
+                Laravel. Namun, konsep pengujian adalah sama jika anda menggunakan Pest.</p>
+        </div>
+
+        <h3>Bab 3.3: Penulisan Ujian Unit untuk Model, Controller, dan Route</h3>
+        <p>Ujian unit memfokuskan pada pengujian bahagian kecil kod secara terasing. Dalam Laravel, ini sering
+            melibatkan:</p>
+        <ul>
+            <li><strong>Model:</strong> Memastikan hubungan, skop, dan mutator/accessor berfungsi dengan betul.</li>
+            <li><strong>Controller:</strong> Mengesahkan logik controller, seperti validasi input, interaksi dengan
+                model, dan respons yang betul (cth., view, JSON, redirect).</li>
+            <li><strong>Route:</strong> Memastikan route mengarah ke controller yang betul dan boleh diakses.</li>
+        </ul>
+
+        <h4>Mencipta Fail Ujian dan Factory</h4>
+        <p>Kita akan menguji <code class="command">BookCategoryController</code>. Mula-mula, cipta fail ujian dan
+            factory yang berkaitan jika belum ada.</p>
+        <pre><code class="language-bash">php artisan make:test BookCategoryControllerTest
+php artisan make:factory BookCategoryFactory --model=BookCategory</code></pre>
+
+        <p>Pastikan model <code class="command">BookCategory</code> anda wujud dan mempunyai atribut <code
+                class="command">$fillable</code> yang sesuai.</p>
+        <div class="code-filename">app/Models/BookCategory.php (Contoh)</div>
+        <pre><code class="language-php">namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class BookCategory extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['name', 'code', 'description'];
+}
+</code></pre>
+
+        <p>Kemas kini <code class="command">BookCategoryFactory</code> untuk menjana data ujian.</p>
+        <div class="code-filename">database/factories/BookCategoryFactory.php</div>
+        <pre><code class="language-php">namespace Database\Factories;
+
+use App\Models\BookCategory;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class BookCategoryFactory extends Factory
+{
+    protected $model = BookCategory::class;
+
+    public function definition(): array
+    {
+        return [
+            'name' => $this-&gt;faker-&gt;words(2, true), // Menjana 2 patah perkataan sebagai nama
+            'code' => strtoupper($this-&gt;faker-&gt;unique()-&gt;lexify('CAT???')), // Kod unik seperti CATABC
+            'description' => $this-&gt;faker-&gt;sentence,
+        ];
+    }
+}
+</code></pre>
+
+        <h4>Contoh Penulisan Ujian untuk <code class="command">BookCategoryControllerTest</code></h4>
+        <p>Berikut adalah contoh lengkap fail ujian untuk <code class="command">BookCategoryController</code>. Fail ini
+            mengandungi pelbagai jenis ujian untuk meliputi operasi CRUD.</p>
+        <div class="code-filename">tests/Feature/BookCategoryControllerTest.php</div>
+        <pre><code class="language-php">&lt;?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use App\Models\BookCategory;
+
+class BookCategoryControllerTest extends TestCase
+{
+    use RefreshDatabase; // Memastikan pangkalan data dikosongkan selepas setiap ujian
+
+    /** @test */
+    public function index_view_is_accessible()
+    {
+        $response = $this-&gt;get('/book-category/index'); // Atau route sebenar anda
+
+        $response-&gt;assertStatus(200);
+        $response-&gt;assertViewIs('book-category.index'); // Pastikan nama view betul
+    }
+
+    /** @test */
+    public function list_returns_all_categories_as_json()
+    {
+        BookCategory::factory()-&gt;count(3)-&gt;create();
+
+        $response = $this-&gt;getJson('/book-category/list'); // Atau route API sebenar
+
+        $response-&gt;assertStatus(200)
+                 -&gt;assertJsonCount(3) // Memastikan 3 kategori dikembalikan
+                 -&gt;assertJsonStructure([
+                     '*' =&gt; ['id', 'name', 'code', 'description', 'created_at', 'updated_at']
+                 ]);
+    }
+
+    /** @test */
+    public function can_store_book_category()
+    {
+        $data = [
+            'name' => 'Mathematics',
+            'code' => 'MATH',
+            'description' => 'Math related books',
+        ];
+
+        $response = $this-&gt;postJson('/book-category', $data); // Atau route API sebenar
+
+        $response-&gt;assertStatus(201) // 201 Created
+                 -&gt;assertJsonFragment(['name' => 'Mathematics']);
+
+        $this-&gt;assertDatabaseHas('book_categories', ['code' => 'MATH']);
+    }
+
+    /** @test */
+    public function store_validation_fails_with_empty_data()
+    {
+        $response = $this-&gt;postJson('/book-category', []); // Hantar data kosong
+
+        $response-&gt;assertStatus(422) // 422 Unprocessable Entity (ralat validasi)
+                 -&gt;assertJsonValidationErrors(['name', 'code']); // Memastikan ralat validasi untuk 'name' dan 'code'
+    }
+
+    /** @test */
+    public function can_show_specific_book_category()
+    {
+        $category = BookCategory::factory()-&gt;create();
+
+        $response = $this-&gt;getJson("/book-category/{$category-&gt;id}"); // Atau route API sebenar
+
+        $response-&gt;assertStatus(200)
+                 -&gt;assertJsonFragment(['id' => $category-&gt;id]);
+    }
+
+    /** @test */
+    public function show_returns_404_if_not_found()
+    {
+        $response = $this-&gt;getJson('/book-category/999'); // ID yang tidak wujud
+
+        $response-&gt;assertStatus(404); // Not Found
+    }
+
+    /** @test */
+    public function can_update_book_category()
+    {
+        $category = BookCategory::factory()-&gt;create([
+            'name' => 'History',
+            'code' => 'HIS',
+        ]);
+
+        $updateData = [
+            'name' => 'Updated History',
+            'code' => 'HISUPD', // Pastikan kod juga boleh dikemaskini jika perlu
+            'description' => 'Updated description for history books',
+        ];
+
+        $response = $this-&gt;putJson("/book-category/{$category-&gt;id}", $updateData);
+
+        $response-&gt;assertStatus(200)
+                 -&gt;assertJsonFragment(['name' => 'Updated History']);
+
+        $this-&gt;assertDatabaseHas('book_categories', [
+            'id' => $category-&gt;id,
+            'name' => 'Updated History',
+            'code' => 'HISUPD'
+        ]);
+    }
+
+    /** @test */
+    public function can_delete_book_category()
+    {
+        $category = BookCategory::factory()-&gt;create();
+
+        $response = $this-&gt;deleteJson("/book-category/{$category-&gt;id}");
+
+        $response-&gt;assertStatus(200);
+        // Anda mungkin mahu assert respons JSON tertentu jika ada, cth:
+        // $response->assertJson(['message' => 'Category deleted successfully']);
+
+        $this-&gt;assertDatabaseMissing('book_categories', ['id' => $category-&gt;id]);
+    }
+}
+</code></pre>
+        <div class="note">
+            <p><strong>Nota Penting tentang <code class="command">RefreshDatabase</code>:</strong></p>
+            <p>Trait <code class="command">Illuminate\Foundation\Testing\RefreshDatabase</code> sangat berguna. Ia akan
+                menjalankan migrasi pangkalan data sebelum setiap ujian dan mengembalikan pangkalan data kepada keadaan
+                asal selepas ujian selesai. Ini memastikan ujian anda dijalankan dalam persekitaran yang bersih dan
+                konsisten setiap kali.</p>
+            <p>Untuk ini berfungsi, anda perlu mengkonfigurasi pangkalan data ujian anda. Selalunya, ini adalah
+                pangkalan data SQLite dalam memori. Semak fail <code class="command">phpunit.xml</code> anda untuk
+                konfigurasi pangkalan data ujian (biasanya <code
+                    class="command">&lt;env name="DB_CONNECTION" value="sqlite"/&gt;</code> dan <code
+                    class="command">&lt;env name="DB_DATABASE" value=":memory:"/&gt;</code>).</p>
+        </div>
+
+        <h3>Bab 3.4: Aktiviti Pembelajaran</h3>
+        <ol>
+            <li><strong>Membina Fail Ujian untuk Model Pelajar (jika belum ada):</strong>
+                <ul>
+                    <li>Gunakan <code class="command">php artisan make:test PelajarTest --unit</code> untuk ujian unit
+                        model.</li>
+                    <li>Tulis ujian untuk mengesahkan atribut <code class="command">$fillable</code>.</li>
+                    <li>Tulis ujian untuk sebarang hubungan (relationships) atau skop (scopes) jika ada pada model <code
+                            class="command">Pelajar</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Membina/Melengkapkan Fail Ujian untuk Controller Pelajar:</strong>
+                <ul>
+                    <li>Ambil contoh <code class="command">BookCategoryControllerTest</code> di atas sebagai panduan.
+                    </li>
+                    <li>Pastikan anda menguji semua metod CRUD dalam <code class="command">PelajarController</code>
+                        (index, list, store, show, update, destroy).</li>
+                    <li>Uji kes berjaya dan juga kes gagal (cth., ralat validasi, item tidak dijumpai).</li>
+                    <li>Gunakan <code class="command">PelajarFactory</code> untuk menjana data ujian.</li>
+                </ul>
+            </li>
+            <li><strong>Menjalankan dan Mengesahkan Keputusan Ujian:</strong>
+                <ul>
+                    <li>Jalankan <code class="command">php artisan test</code>.</li>
+                    <li>Pastikan semua ujian anda lulus. Jika ada yang gagal, debug kod ujian atau kod aplikasi anda
+                        sehingga semua ujian berwarna hijau.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Bab 3.5: Penilaian</h3>
+        <ul>
+            <li>✅ Minimum 3 ujian unit (atau lebih) telah ditulis dan berjaya dijalankan untuk controller atau model
+                berkaitan data pelajar.</li>
+            <li>🧠 Pelajar menunjukkan pemahaman asas tentang Pembangunan Berasaskan Ujian (Test-Driven Development -
+                TDD) dengan menjelaskan bagaimana ujian ditulis sebelum atau sejurus selepas kod aplikasi dibangunkan.
+            </li>
+            <li>🔍 Mampu menerangkan fungsi setiap <code class="command">assert</code> yang digunakan dalam ujian (cth.,
+                <code class="command">assertStatus</code>, <code class="command">assertJsonFragment</code>, <code
+                    class="command">assertDatabaseHas</code>, <code class="command">assertDatabaseMissing</code>, <code
+                    class="command">assertViewIs</code>, <code class="command">assertJsonValidationErrors</code>).
+            </li>
+        </ul>
+
+        <div class="note">
+            <h4>Apa itu Pembangunan Berasaskan Ujian (TDD)?</h4>
+            <p>TDD adalah satu pendekatan pembangunan perisian di mana anda menulis ujian <em>sebelum</em> anda menulis
+                kod fungsi sebenar. Kitaran TDD secara ringkas:</p>
+            <ol>
+                <li><strong>Red:</strong> Tulis ujian yang gagal kerana fungsi belum wujud atau tidak lengkap.</li>
+                <li><strong>Green:</strong> Tulis jumlah kod yang minimum untuk membuat ujian itu lulus.</li>
+                <li><strong>Refactor:</strong> Perbaiki kod (aplikasi dan ujian) tanpa mengubah tingkah lakunya untuk
+                    menjadikannya lebih bersih dan efisien.</li>
+            </ol>
+            <p>Walaupun modul ini mungkin tidak mengikut TDD secara ketat (anda mungkin menulis ujian selepas kod
+                ditulis), memahami prinsipnya adalah penting.</p>
+        </div>
+
+        <a href="#content" class="back-to-top-button">⬆️ Kembali ke atas</a>
+    </main>
+</body>
+
+</html>
